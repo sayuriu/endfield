@@ -1,0 +1,255 @@
+@import '../../../styles/anims';
+@import './CN-anim.module.scss';
+
+$logo-anim-delay: 0s;
+.logo {
+    path, #en-square {
+        fill: #fff;
+    }
+    path[inverse] {
+        fill: #000;
+    }
+    *[char-outline] {
+        stroke: #fff;
+        stroke-width: 0px;
+    }
+}
+
+//#region CN-"Arknights"
+$arknights-cn-anim-delay: calc(#{$logo-anim-delay} + 0s);
+.arknights-cn {
+    opacity: 0;
+    transform: translateY(-10px);
+
+    $delay: calc(
+        applyPlaybackSpeed(#{$arknights-cn-anim-delay}) +
+        applyPlaybackSpeed(0.05s) * var(--order)
+    );
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.5s) #{$delay} steps(1) forwards,
+        slide_UD
+            applyPlaybackSpeed(0.8s) #{$delay} $forceful forwards;
+}
+//#endregion
+
+//#region CN-"Endfield"
+.endfield-cn { opacity: 0; }
+$endfield-cn-chr1-delay: calc(#{$logo-anim-delay} + 0.8s);
+
+#endfield-cn-chr1-stroke-tl-1 {
+    transform: translateX(-10px);
+    animation:
+        opacity_spawn
+
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$endfield-cn-chr1-delay}) steps(1) forwards,
+        slide_LR
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(#{$endfield-cn-chr1-delay})
+            $forceful forwards;
+}
+#endfield-cn-chr1-main-t {
+    transform: translateY(-10px);
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.1s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            steps(1) forwards,
+        slide_DU
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards;
+}
+
+#endfield-cn-chr1-main-t-inner-l {
+    transform: translateY(10px) scaleY(1.4);
+    d: path("M12.2,27H8.8v-3.5l2.5,-3.5h2.3l1.8-2.5,2.7,1.9v3.5Z");
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.15s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            steps(1) forwards,
+        endfield-cn-chr1-main-t-inner-l-translate
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.1s))
+            $slow-down forwards,
+        endfield-cn-chr1-main-t-inner-l-path
+            applyPlaybackSpeed(0.8s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.1s))
+            $slow-down forwards;
+}
+
+
+#endfield-cn-chr1-main-t-inner-r {
+    transform: translateY(10px) scaleY(1.4);
+    d: path("M21.85,16.7l-3.25,-1.7v-3.5h6.2Zv3.5");
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.15s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            steps(1) forwards,
+        endfield-cn-chr1-main-t-inner-r-translate
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.1s))
+            $slow-down forwards,
+        endfield-cn-chr1-main-t-inner-r-path
+            applyPlaybackSpeed(0.8s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.1s))
+            $slow-down forwards;
+}
+
+#endfield-cn-chr1-stroke-bl-1 {
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.3s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            steps(1) forwards,
+        slide_DU
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards;
+}
+#endfield-cn-chr1-stroke-bl-2 {
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.35s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            steps(1) forwards,
+        slide_DU
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards;
+}
+#endfield-cn-chr1-main-b {
+    d: path("M12,37.6v-7.8h2.5l3.285,-2.4l10.3,7l3.85,2.7v0.5h-7.46l-7.88,-5.59v5.6Z");
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.45s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            steps(1) forwards,
+        slide_LR
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards,
+        endfield-cn-chr1-main-b-path
+            applyPlaybackSpeed(0.5s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.4s))
+            $forceful forwards,
+}
+#endfield-cn-chr1-stroke-br-1 {
+    $delay: calc(#{$endfield-cn-chr1-delay} + 0.52s);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.3s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+        endfield-cn-chr1-stroke-br-1
+            applyPlaybackSpeed(0.5s) applyPlaybackSpeed(#{$delay}) $forceful forwards;
+}
+
+$endfield-cn-chr2-delay: calc(#{$logo-anim-delay} + 1.5s);
+#endfield-cn-chr2 {
+    transform-origin: left;
+    // transform: scaleX(1.3) translateX(0.4px);
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.4s) applyPlaybackSpeed(#{$endfield-cn-chr2-delay}) steps(1) forwards,
+        endfield-cn-chr2-transform
+            applyPlaybackSpeed(0.7s) applyPlaybackSpeed(#{$endfield-cn-chr2-delay}) $forceful forwards;
+}
+
+$endfield-cn-chr3-delay: calc(#{$logo-anim-delay} + 2.3s);
+#endfield-cn-chr3-1 {
+    opacity: 1;
+    transform: translateY(8px);
+    $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+    animation:
+        endfield-cn-chr3-1-slide
+            applyPlaybackSpeed(0.8s)
+            applyPlaybackSpeed(#{$delay})
+            $slow-down forwards;
+}
+#endfield-cn-chr3-2 {
+    opacity: 1;
+    transform: translateY(4.5px);
+    $delay: calc(#{$endfield-cn-chr3-delay} + 0.13s);
+    animation:
+        endfield-cn-chr3-2-slide
+            applyPlaybackSpeed(0.8s)
+            applyPlaybackSpeed(#{$delay})
+            $slow-down forwards;
+}
+
+#endfield-cn-chr3 {
+    clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%);
+    $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+    animation:
+        expand_DU
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards,
+}
+
+#inverse {
+    mix-blend-mode: exclusion;
+    clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%);
+    $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+    animation:
+        expand_DU
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards,
+        collapse_DU
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.8s))
+            $slow-down forwards,
+}
+//#endregion
+
+//#region EN
+#en-square {
+    $delay: applyPlaybackSpeed(3.2s);
+    clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+    animation:
+        expand_LR
+            applyPlaybackSpeed(0.5s) #{$delay} $forceful forwards,
+}
+
+$en-arknights-anim-delay: 3.2s;
+.arknights {
+    opacity: 0;
+    transform: translateY(10px);
+
+    //     applyPlaybackSpeed(0.02s) * var(--order)
+    $delay: calc(
+        applyPlaybackSpeed(#{$en-arknights-anim-delay})
+    );
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.5s) #{$delay} steps(1) forwards,
+        slide_DU
+            applyPlaybackSpeed(0.8s) #{$delay} $forceful forwards;
+}
+
+// $en-endfield-anim-delay: 3.4s;
+$en-endfield-anim-delay: 3.35s;
+.endfield {
+    opacity: 0;
+    transform: translateY(10px);
+
+    // applyPlaybackSpeed(0.02s) * var(--order)
+    $delay: calc(
+        applyPlaybackSpeed(#{$en-endfield-anim-delay})
+    );
+    animation:
+        opacity_spawn
+            applyPlaybackSpeed(0.5s) #{$delay} steps(1) forwards,
+        slide_DU
+            applyPlaybackSpeed(0.7s) #{$delay} $forceful forwards;
+}
+//#endregion

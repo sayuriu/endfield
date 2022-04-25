@@ -1,0 +1,49 @@
+@keyframes logo_cn_main_scale {
+    from { transform: scale(1) }
+    to { transform: scale(2.125) }
+}
+@keyframes logo_cn_main_stroke {
+    from {
+        stroke-width: 0;
+        fill: #fff;
+    }
+    30% {
+        stroke-width: 0.2px;
+        stroke: #fff;
+        fill: transparent;
+    }
+    to {
+        stroke-width: 0;
+        fill: #fff;
+    }
+}
+@keyframes logo_cn_main_translate {
+    from { transform: translate(30px, 16px) }
+    to { transform: translate(13px, 16px) }
+}
+@keyframes logo_cn_1 {
+    100%,0% { transform: translate(35.9px, 35.5px) scale(1.215) }
+    40% { transform: translate(37.9px, 44.5px) scale(1.215) }
+}
+@keyframes logo_cn_2 {
+    from { transform: translate(12px, -8px) }
+    to { transform: translate(0) }
+}
+
+@keyframes end_d_slideLR {
+    from { transform: translateX(-8.5px) }
+    to { transform: translateX(0) }
+}
+
+@keyframes field_e_stretch {
+    from {
+        transform: scaleX(1.5);
+    }
+    to {
+        transform: scaleX(1);
+    }
+}
+@keyframes field_e_path {
+    from { d: path("M34.2,50.3h13V44.5h-13V40.7H44.6l2.9-2.8v-3H28.7h19V54.6H34.2Z") }
+    to { d: path("M34.2,50.3h13V44.5h-13V40.7H44.6l2.9-2.8v-3H28.7V60.5h19V54.6H34.2Z") }
+}

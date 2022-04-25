@@ -1,0 +1,92 @@
+.uppercase { text-transform: uppercase; }
+.lowercase { text-transform: lowercase; }
+
+.fw { width: 100% }
+.fh { height: 100% }
+
+.h-auto { height: auto }
+.w-auto { width: auto }
+
+.h-infer { height: inherit }
+.w-infer { width: inherit }
+
+.rel { position: relative }
+.abs { position: absolute }
+.stic { position: sticky }
+
+.t0 { top: 0 }
+.tfull { top: 100% }
+.b0 { bottom: 0 }
+.bfull { bottom: 100% }
+.l0 { left: 0 }
+.lfull { left: 100% }
+.r0 { right: 0 }
+.rfull { right: 100% }
+
+
+.z-1 { z-index: -1 }
+.z0 { z-index: 0 }
+.z1 { z-index: 1 }
+.z2 { z-index: 2 }
+.z3 { z-index: 3 }
+.z4 { z-index: 4 }
+.z5 { z-index: 5 }
+
+.in0 { inset: 0 }
+
+.o0 { opacity: 0 }
+.o1 { opacity: 1 }
+
+.overflow-hidden { overflow: hidden }
+.overflow-auto-y { overflow-y: auto }
+.overflow-scroll-y { overflow-y: scroll }
+.overflow-auto-x { overflow-x: auto }
+.overflow-scroll-x { overflow-x: scroll }
+.overflow-none-x { overflow-x: hidden }
+.overflow-auto { overflow: auto }
+
+.txt-algn-left { text-align: left }
+.txt-algn-right { text-align: right }
+.txt-algn-center { text-align: center }
+
+.inline { display: inline }
+.inline-flex { display: inline-flex }
+.inline-blk { display: inline-block }
+.grid { display: grid }
+
+.flex { display: flex }
+.flex-wrap { flex-wrap: wrap }
+.flex-nowrap { flex-wrap: nowrap }
+
+.flex-grow-1 { flex-grow: 1 }
+
+.flex-col { flex-direction: column }
+.flex-col-rev { flex-direction: column-reverse }
+.flex-row { flex-direction: row }
+.flex-row-rev { flex-direction: row-reverse }
+
+.j-flex-end { justify-content: flex-end }
+.j-flex-start { justify-content: flex-start }
+.j-flex-center { justify-content: center }
+.j-flex-space-between { justify-content: space-between }
+
+.a-flex-center { align-items: center }
+.a-flex-strech { align-items: stretch }
+
+.a-self-center { align-self: center }
+.a.self-flend { align-self: flex-end }
+.a-self-flstart { align-self: flex-start }
+
+.no-border { border: 0 }
+.no-margin { margin: 0 }
+.no-padding { padding: 0 }
+
+.no-pointer { pointer-events: none }
+.pointer-all { pointer-events: all }
+.pointer-visible { pointer-events: visible }
+
+.cur-pointer { cursor: pointer }
+.cur-default { cursor: default }
+.cur-help { cursor: help }
+.cur-resize-ew { cursor: ew-resize }
+.cur-resize-ns { cursor: ns-resize }

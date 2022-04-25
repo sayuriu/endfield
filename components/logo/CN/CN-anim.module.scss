@@ -1,0 +1,44 @@
+@import '../../../styles/anims';
+
+@keyframes endfield-cn-chr1-main-t-inner-l-translate {
+    from { transform: translateY(-20px) scaleY(2.5); }
+    to { transform: translateY(0) scaleY(1); }
+}
+
+@keyframes endfield-cn-chr1-main-t-inner-l-path {
+    from { d: path("M12.2,27H8.8v-3.5l2.5,-3.5h2.3l1.8-2.5,2.7,1.9v3.5Z"); }
+    to { d: path("M12.2,23.8H8.8v0l2.5-3.5h2.3l1.8-2.5,2.7,1.9v0Z"); }
+}
+
+@keyframes endfield-cn-chr1-main-t-inner-r-translate {
+    from { transform: translateY(0px) scaleY(2.5); }
+    to { transform: translateY(0) scaleY(1); }
+}
+@keyframes endfield-cn-chr1-main-t-inner-r-path {
+    from { d: path("M21.85,16.7l-3.25,-1.7v-3.5h6.2v3.5Z"); }
+    to { d: path("M21.85,16.7l-3.25,-1.7v0h6.2v0Z"); }
+}
+
+@keyframes endfield-cn-chr1-stroke-br-1 {
+    from { transform: translate(-3px, -2px); }
+    to { transform: translate(0, 0); }
+}
+
+@keyframes endfield-cn-chr1-main-b-path {
+    from { d: path("M12,37.6v-7.8h2.5l3.285,-2.4l10.3,7l3.85,2.7v0.52h-7.46l-7.88,-5.59v5.6Z") }
+    to { d: path("M12,37.6v-7.8h2.5l3.285,-2.4l10.3,7l3.85,-2.68v5.77h-7.46l-7.88,-5.59v5.6Z") }
+}
+
+@keyframes endfield-cn-chr2-transform {
+    from { stroke: white; fill: hsla(0, 0, 0, 0); }
+    to { stroke: transparent; fill: white; }
+}
+
+@keyframes endfield-cn-chr3-1-slide {
+    from { transform: translateY(8px) }
+    to { transform: translateY(0) }
+}
+@keyframes endfield-cn-chr3-2-slide {
+    from { transform: translateY(4.5px) }
+    to { transform: translateY(0) }
+}
