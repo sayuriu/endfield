@@ -29,7 +29,7 @@ const Home: NextPage<PageProps> = ({ lang, animateAgain }) => {
         animateAgain = router.query.animateAgain?.toString() ?? null;
 
     useEffect(() => {
-        if (!["en"].includes(lang))
+        if (!['en'].includes(lang ?? ''))
         {
             router.query.lang = 'en';
             void router.push(router);
@@ -82,7 +82,7 @@ const Home: NextPage<PageProps> = ({ lang, animateAgain }) => {
             >
                 <IntroLogo/>
             </motion.div>}
-            {logoVisible && lang === "en" && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            {logoVisible && lang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
             {!isLoading && <>
                 <Header key="header"/>
                 <Body key="body"/>
