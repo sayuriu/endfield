@@ -68,13 +68,14 @@
 }
 
 .terrain {
-    animation-duration: 28s;
-    animation-timing-function: linear;
+    animation-duration: 35s;
+    animation-timing-function: cubic-bezier(0.34, 0.02, 0.65, 1);
     animation-iteration-count: infinite;
     animation-direction: alternate-reverse;
     fill: transparent;
-    stroke: hsl(0, 0%, 50%);
+    stroke: hsl(0, 0%, 30%);
 }
+.highlight { stroke: hsl(0, 0%, 75%); }
 #_1 { animation-name: _1; }
 #_2 { animation-name: _2; }
 #_3 { animation-name: _3; }

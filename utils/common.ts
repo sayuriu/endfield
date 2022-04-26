@@ -7,7 +7,7 @@ export type Nullable<T> = T | null;
 export type NullablePromise<T> = Promise<Nullable<T>>;
 
 export interface HasAnimation {
-    dontAnimateChild?: Nullable<true>;
+    dontAnimateChild?: Nullable<boolean>;
 }
 
 export interface OverridableStyle {

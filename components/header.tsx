@@ -17,8 +17,9 @@ export const Header:  FC = () => {
                 w={"100vw"}
                 bg={"#000"}
                 borderBottom={"1px solid #fff"}
+                className={"rel flex a-flex-center j-flex-space-between"}
             >
-                HEAD
+
             </Box>
         </motion.div>
     );

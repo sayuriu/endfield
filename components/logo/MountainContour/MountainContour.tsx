@@ -7,7 +7,7 @@ export const MountainContourLogo: FC<HasAnimation & OverridableStyle & Logo & Mo
     return (
         <motion.svg
             className={styles.MCLogo}
-            data-noanim={dontAnimateChild}
+            data-noanim={dontAnimateChild ? dontAnimateChild : null}
             style={overrideStyles}
             viewBox={noLogoText ? "0 0 53 47" : "0 0 124 47"}
             fill="none"

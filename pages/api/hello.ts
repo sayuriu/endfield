@@ -9,5 +9,5 @@ export default function handler(
     req: NextApiRequest,
     res: NextApiResponse<Data>
 ) {
-    res.status(200).json({ message: 'Welcome to Talos II.' });
+    res.status(200).json({ message: 'Welcome to Talos II. It\'s time to make your choice, Endministrator.' });
 };
