@@ -39,15 +39,16 @@ export const Footer:  FC = () => {
                 className={"rel flex a-flex-center j-flex-space-between"}
             >
                 <TerrainMap />
-                <Box w={340} className={"fh flex"} paddingLeft={50} zIndex={1}>
+                <Box w={340} className={"fh flex"} paddingLeft={50} zIndex={2}>
                     <HypergryphLogo
-                        woke={true}
-                        dontAnimateChild={true}
+                        woke
+                        link
+                        dontAnimateChild
                         overrideStyles={{width: "55%"}}
                         {...LogoAnimConfig(.1)}
                     />
                     <MountainContourLogo
-                        dontAnimateChild={true}
+                        dontAnimateChild
                         overrideStyles={{width: "45%"}}
                         {...LogoAnimConfig(.3)}
                     />
@@ -60,9 +61,10 @@ export const Footer:  FC = () => {
                     textAlign="right"
                     zIndex={1}
                     whiteSpace="nowrap"
+                    maxWidth={"70%"}
+                    isTruncated
                 >
-                    This project is fan-made and does not represent the&nbsp;
-                    <Anchor to="https://endfield.hypergryph.global">official website.</Anchor>
+                    This project is fan-made and does not represent the official website.
                     <br/>
                     <Anchor to="https://endfield.hypergryph.global">To official site</Anchor>&thinsp;|&thinsp;
                     <Anchor to="https://endfield.hypergryph.com">CN ver</Anchor>
@@ -80,11 +82,17 @@ const TerrainMap = () => {
     return(
         <motion.div
             style={{
-                width: "50%",
+                width: "700px",
             }}
-            className={"fh abs grid t0 l0 overflow-hidden z0"}
+            className={"fh abs t0 l0 overflow-hidden z0"}
         >
             <svg viewBox="1 30 485 1140.294" width="700" opacity={.5}>
+                <defs>
+                    <linearGradient id={"footer__terrain-cover"}>
+                        <stop offset={"0%"} stopColor={"#00000000"}/>
+                        <stop offset={"98%"} stopColor={"#000"}/>
+                    </linearGradient>
+                </defs>
                 <path id={terrainStyles["_b2"]} className={terrainStyles["terrain"]}/>
                 <path id={terrainStyles["_b1"]} className={joinClasses(terrainStyles["terrain"], terrainStyles["highlight"])}/>
                 <path id={terrainStyles["_1"]} className={terrainStyles["terrain"]}/>
@@ -104,15 +112,8 @@ const TerrainMap = () => {
                 <path id={terrainStyles["_15"]} className={terrainStyles["terrain"]}/>
                 <path id={terrainStyles["_16"]} className={joinClasses(terrainStyles["terrain"], terrainStyles["highlight"])}/>
                 <path id={terrainStyles["_17"]} className={terrainStyles["terrain"]}/>
+                <rect x={0} y={0} width={500} height={1140.294} fill={"url(#footer__terrain-cover)"}/>
             </svg>
-            <Box
-                className={joinClasses(terrainStyles["cover"], "fh")}
-                w={160}
-                transform={"translateX(-92px)"}
-                bgImage={"linear-gradient(-90deg, hsl(0, 0%, 0%) 75% 50%, transparent 100% 50%)"}
-                gridColumnStart={2}
-                gridRowStart={1}
-            />
         </motion.div>
     );
 };

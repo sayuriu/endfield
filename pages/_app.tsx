@@ -7,18 +7,12 @@ import {useEffect} from "react";
 import Head from 'next/head';
 
 function Main({ Component, pageProps }: AppProps) {
-    useEffect(() => {
-        if (window)
-        {
-            document.body.style.setProperty('--anim-playback-rate', '1.35');
-        }
-    });
     return <>
         <Head>
             <title>ENDFIELD</title>
         </Head>
         <ChakraProvider>
-            <Box className={"abs"} h={"100vh"} w={"100vw"} bg={"#000"} overflow={"hidden"}>
+            <Box className={"abs overflow-hidden"} h={"100vh"} w={"100vw"} bg={"#000"}>
                 <div className={"rel fw fh"}>
                     <Component {...pageProps} />
                 </div>

@@ -5,6 +5,13 @@ body {
     font-family: "JetBrains Mono", Consolas, serif;
     --anim-playback-rate: 1.55;
     will-change: contents;
+    background: #000;
+}
+
+body {
+    overflow: hidden;
+    transition: 0.5s cubic-bezier(0.88,-0.07, 0.22, 1.01);
+    transition-property: width, height;
 }
 
 a {

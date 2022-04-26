@@ -1,0 +1,36 @@
+@import '../../../styles/anims';
+@import './CN-anim.module.scss';
+
+$logo-anim-delay: 0s;
+.logo {
+    .endfield-cn {
+        stroke-width: 0.15px;
+        stroke: #fff;
+    }
+    path {
+        fill: #fff;
+        &[data-inverse] {
+            fill: #000;
+        }
+    }
+    &:not([data-noanim])
+    {
+        //#region CN-"Arknights"
+        $arknights-cn-anim-delay: calc(#{$logo-anim-delay} + 0s);
+        .arknights-cn {
+            opacity: 0;
+            transform: translateY(-10px);
+
+            $delay: calc(
+                applyPlaybackSpeed(#{$arknights-cn-anim-delay}) +
+                applyPlaybackSpeed(0.05s) * var(--order)
+            );
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.5s) #{$delay} steps(1) forwards,
+                slide_UD
+                applyPlaybackSpeed(0.8s) #{$delay} $forceful forwards;
+        }
+        //#endregion
+    }
+}

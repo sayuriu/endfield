@@ -16,6 +16,22 @@ interface PageProps {
     intro: Nullable<string>,
 }
 
+function animateSequence(...defs: [() => void, number][]) {
+    for (const [fn, delay] of defs)
+        setTimeout(fn, delay);
+}
+
+function getIntroAnimSpeed(lang: string)
+{
+    switch (lang) {
+        default:
+        case 'en':
+            return 1.35;
+        case 'cn':
+            return 1.53;
+    }
+}
+
 const Home: NextPage<PageProps> = ({ lang, intro }) => {
     const [progressPercentage , setProgressPercentage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
@@ -39,7 +55,12 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
         }
 
         let animateLogo = true;
-        if (intro !== 'true')
+        if (intro === 'true')
+        {
+            if (window)
+                document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());
+        }
+        else
         {
             let time = localStorage.getItem('endfield-time');
             if (!time)
@@ -61,14 +82,16 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
         }
 
         setDontAnimate(animateLogo ? null : true);
-        setTimeout(() => setIsIntroVisible(true), 500);
-        setTimeout(() => setIsIntroVisible(false), 3500);
-        setTimeout(() => setLogoVisible(true), 4000);
-        setTimeout(() => {
-            setProgressPercentage(100);
-            setTimeout(() => setLogoVisible(false), 1000);
-        }, animateLogo ? 9500 : 4200);
-        setTimeout(() => setIsLoading(false), animateLogo ? 10800 : 5500);
+        animateSequence(
+            [() => setIsIntroVisible(true), 500],
+            [() => setIsIntroVisible(false), 3500],
+            [() => setLogoVisible(true), 4000],
+            [() => {
+                setProgressPercentage(100);
+                setTimeout(() => setLogoVisible(false), 1000);
+            }, animateLogo ? 9500 : 4200],
+            [() => setIsLoading(false), animateLogo ? 10800 : 5500]
+        );
     }, []);
 
     return <div className="rel fw fh flex j-flex-center a-flex-center">
