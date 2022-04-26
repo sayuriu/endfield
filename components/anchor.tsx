@@ -25,10 +25,15 @@ export const Anchor: FC<AnchorProps> = ({
         animate={{
             color: "hsl(231, 0%, 90%)",
             textDecoration: "underline dotted",
-            textUnderlineOffset: isHovered ? "-2em" : "0.1em",
-            textDecorationColor: isHovered ? "hsla(0, 0%, 0%, 0)" : "hsl(231, 0%, 65%)",
+            textUnderlineOffset: isHovered ? "-1.1em" : "0.1em",
+            textDecorationColor: "hsl(231, 0%, 65%)",
         }}
         transition={{
+            textUnderlineOffset: {
+                duration: 0.3,
+                delay: isHovered ? 0 : 0.2,
+                ease: Forceful,
+            },
             duration: 0.3,
             ease: Forceful,
         }}
@@ -50,9 +55,7 @@ export const Anchor: FC<AnchorProps> = ({
                 duration: 0.5,
                 ease: Forceful,
             }}
-        >
-
-        </motion.span>
+        />
         {children}
     </motion.a>;
 };

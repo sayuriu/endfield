@@ -16,7 +16,7 @@ export const HypergryphLogo: FC<HasAnimation & OverridableStyle & Logo & HGWoke 
             xmlnsXlink="http://www.w3.org/1999/xlink"
             {...animProps}
         >
-            <Anchor to="https://hypergrpyh.com">
+            <Anchor to="https://hypergryph.com">
                 <rect width="173" height="60" fill="transparent"/>
                 {woke && <path d="M12.5 43.3L14 40.2L13.9 42.7Z" fill="#000"/>}
                 <path

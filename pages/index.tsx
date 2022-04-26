@@ -1,5 +1,4 @@
 import type { NextPage } from 'next';
-import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
@@ -9,63 +8,68 @@ import { Header } from '@components/header';
 import {IntroLogo} from "@components/logo/IntroLogo";
 import { Body } from '@components/body';
 import {Nullable} from "@utils/common";
+import { LogoLarge_EN } from "@components/logo/EN/EN-big";
+import { LogoLarge_CN } from "@components/logo/CN/CN-big";
 
 interface PageProps {
     lang: Nullable<string>,
-    animateAgain: Nullable<string>,
+    intro: Nullable<string>,
 }
 
-const Home: NextPage<PageProps> = ({ lang, animateAgain }) => {
+const Home: NextPage<PageProps> = ({ lang, intro }) => {
     const [progressPercentage , setProgressPercentage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [logoVisible, setLogoVisible] = useState(false);
     const [isIntroVisible, setIsIntroVisible] = useState(false);
-    const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(null);
+    const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
 
     const router = useRouter();
     if (!lang && 'lang' in router.query)
         lang = router.query.lang?.toString() ?? null;
-    if (!animateAgain && 'animateAgain' in router.query)
-        animateAgain = router.query.animateAgain?.toString() ?? null;
+    if (!intro && 'intro' in router.query)
+        intro = router.query.intro?.toString() ?? null;
 
     useEffect(() => {
-        if (!['en'].includes(lang ?? ''))
+        if (!['en', 'cn'].includes(lang ?? ''))
         {
             router.query.lang = 'en';
+            intro ? router.query.intro = intro : null;
             void router.push(router);
             return () => {};
         }
 
-        if (animateAgain === 'true')
-            setDontAnimate(null);
-        else
+        let animateLogo = true;
+        if (intro !== 'true')
         {
             let time = localStorage.getItem('endfield-time');
             if (!time)
-            {
-                time = new Date().toISOString();
-                localStorage.setItem('endfield-time', time);
-            }
+                localStorage.setItem('endfield-time', new Date().toISOString() + "@first");
             else
             {
-                const timeThen = new Date(time).getTime();
-                const timeDiff = Date.now() - timeThen;
-                if (timeDiff < 1000 * 60 * 60 * 24)
-                    setDontAnimate(true);
+                if (time.includes('@first'))
+                    localStorage.setItem('endfield-time', time.replace('@first', ''));
                 else
-                    localStorage.setItem('endfield-time', new Date(timeThen + 1000 * 60 * 60 * 24).toISOString());
+                {
+                    const timeThen = new Date().getTime();
+                    const timeDiff = Date.now() - timeThen;
+                    if (timeDiff < 1000 * 60 * 60 * 24)
+                        animateLogo = false;
+                    else
+                        localStorage.setItem('endfield-time', new Date(timeThen + 1000 * 60 * 60 * 24).toISOString());
+                }
             }
         }
 
+        setDontAnimate(animateLogo ? null : true);
         setTimeout(() => setIsIntroVisible(true), 500);
         setTimeout(() => setIsIntroVisible(false), 3500);
         setTimeout(() => setLogoVisible(true), 4000);
         setTimeout(() => {
             setProgressPercentage(100);
             setTimeout(() => setLogoVisible(false), 1000);
-        }, dontAnimate ? 4200 : 9500);
-        setTimeout(() => setIsLoading(false), dontAnimate ? 5500 : 11000);
-    }, [lang, animateAgain, dontAnimate, router]);
+        }, animateLogo ? 9500 : 4200);
+        setTimeout(() => setIsLoading(false), animateLogo ? 10800 : 5500);
+    }, []);
 
     return <div className="rel fw fh flex j-flex-center a-flex-center">
         <AnimatePresence>
@@ -83,6 +87,7 @@ const Home: NextPage<PageProps> = ({ lang, animateAgain }) => {
                 <IntroLogo/>
             </motion.div>}
             {logoVisible && lang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            {logoVisible && lang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
             {!isLoading && <>
                 <Header key="header"/>
                 <Body key="body"/>
@@ -97,7 +102,7 @@ export async function getServerSideProps(context: { query: Record<string, string
     return {
         props:{
             lang: context.query.lang ?? null,
-            animateAgain: context.query.animateAgain ?? null,
+            intro: context.query.intro ?? null,
         }
     };
 }
