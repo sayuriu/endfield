@@ -29,7 +29,7 @@ const Home: NextPage<PageProps> = ({ lang, animateAgain }) => {
         animateAgain = router.query.animateAgain?.toString() ?? null;
 
     useEffect(() => {
-        if (lang === undefined)
+        if (!["en"].includes(lang))
         {
             router.query.lang = 'en';
             void router.push(router);
