@@ -1,0 +1,58 @@
+@import "styles/anims";
+
+@keyframes reset-translateX { to { transform: translateX(0); } }
+
+.logo {
+    max-width: 300px;
+    &:not([data-noanim]) {
+        $arknights-delay: 0;
+        .arknights {
+            opacity: 0;
+            transform: translateY(-10px);
+            $delay: calc(
+                0.1s +
+                0.05s * var(--order)
+            );
+            animation:
+                opacity_spawn
+                    0.5s #{$delay} steps(1) forwards,
+                slide_UD
+                    0.8s #{$delay} $forceful forwards;
+        }
+
+        $endfield-delay: 0.3s;
+        @function endfieldAnimDelay($additionalDelay: 0s) {
+            @return calc(
+                #{$endfield-delay} +
+                0.05s * var(--order) + #{$additionalDelay}
+            );
+        }
+        .end, .field {
+            transform: translateX(-5px);
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            //opacity: 0;
+            animation:
+                //opacity_spawn 0s #{endfieldAnimDelay(.05s)} steps(1) forwards,
+                expand_LR 0.5s #{endfieldAnimDelay()} forwards,
+                reset-translateX 0.5s #{endfieldAnimDelay()} forwards,
+        }
+        #cn {
+            clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+            animation: expand_LR
+                0.5s #{endfieldAnimDelay(0.2s)} forwards;
+            .a,
+            .e-chr1,
+            .e-chr2,
+            .e-chr3 {
+                --order: 1;
+                transform: translateX(-10px);
+                animation: reset-translateX
+                    0.5s #{endfieldAnimDelay(0.5s)} $slow-down forwards;
+            }
+            .a {
+                --order: 0;
+                transform: translateX(-5px);
+            }
+        }
+    }
+}

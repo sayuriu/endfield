@@ -1,9 +1,9 @@
 import {HasAnimation, joinClasses, whichWider} from "@utils/common";
 import {FC, useEffect, useRef, useState} from "react";
-import styles from "@components/logo/CN/CN-big.module.scss";
 import { motion } from "framer-motion";
 import {AnimFunctions} from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
+import styles from "./CN-big.module.scss";
 
 export const LogoLarge_CN: FC<HasAnimation> = ({dontAnimateChild}) => {
     const mode = useRef("fh");

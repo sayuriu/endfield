@@ -6,6 +6,6 @@ export const Body = () => {
         w="100vw"
         padding="0"
     >
-        body
+
     </Box>);
 };

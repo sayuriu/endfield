@@ -2,12 +2,14 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
+import {atom, useAtom} from "jotai";
+
+import { Nullable } from "@utils/common";
 import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import {IntroLogo} from "@components/logo/IntroLogo";
 import { Body } from '@components/body';
-import {Nullable} from "@utils/common";
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big";
 
@@ -28,7 +30,7 @@ function getIntroAnimSpeed(lang: string)
         case 'en':
             return 1.35;
         case 'cn':
-            return 1.53;
+            return 1.545;
     }
 }
 
@@ -112,7 +114,7 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
             {logoVisible && lang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
             {logoVisible && lang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
             {!isLoading && <>
-                <Header key="header"/>
+                <Header key="header" lang={lang}/>
                 <Body key="body"/>
                 <Footer key="footer"/>
             </>}

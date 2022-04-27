@@ -1,12 +1,12 @@
 @import '../../../styles/anims';
 @import './CN-anim.module.scss';
 
+.patch {
+    fill: #fff;
+}
+
 $logo-anim-delay: 0s;
 .logo {
-    .endfield-cn {
-        stroke-width: 0.15px;
-        stroke: #fff;
-    }
     path {
         fill: #fff;
         &[data-inverse] {
@@ -22,14 +22,77 @@ $logo-anim-delay: 0s;
             transform: translateY(-10px);
 
             $delay: calc(
-                applyPlaybackSpeed(#{$arknights-cn-anim-delay}) +
-                applyPlaybackSpeed(0.05s) * var(--order)
+                #{$arknights-cn-anim-delay} +
+                0.05s * var(--order)
             );
             animation:
-                opacity_spawn
-                applyPlaybackSpeed(0.5s) #{$delay} steps(1) forwards,
-                slide_UD
-                applyPlaybackSpeed(0.8s) #{$delay} $forceful forwards;
+                opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                slide_UD 0.8s #{$delay} $forceful forwards;
+        }
+        //#endregion
+        //#region CN-"Endfield"
+        $endfield-cn-anim-delay: .3s;
+        @function endfieldCNAnimDelay($additionalDelay: 0s) {
+            @return calc(
+                #{$endfield-cn-anim-delay} +
+                0.05s * var(--order) + #{$additionalDelay}
+            );
+        }
+        .g-chr1 {
+            .chr1 {
+                opacity: 0;
+                transform: translateY(10px);
+                animation:
+                    opacity_spawn
+                        0.5s endfieldCNAnimDelay(.1s) steps(1) forwards,
+                    slide_DU
+                        0.8s endfieldCNAnimDelay(.1s) $forceful forwards;
+            }
+            #endfield-cn-chr1-stroke-tl-1 {
+                transform: translateX(-10px);
+                animation:
+                    opacity_spawn
+                        0.5s endfieldCNAnimDelay() steps(1) forwards,
+                    slide_LR
+                        0.8s endfieldCNAnimDelay() $forceful forwards;
+            }
+        }
+        .g-chr2 {
+            path {
+                opacity: 0;
+                transform: translateX(10px);
+                animation:
+                    opacity_spawn
+                        0.5s endfieldCNAnimDelay(.08s) steps(1) forwards,
+                    slide_RL
+                        0.8s endfieldCNAnimDelay(.08s) $forceful forwards;
+            }
+        }
+        .g-chr3 {
+            path {
+                opacity: 0;
+                transform: translateX(10px);
+                animation:
+                    opacity_spawn
+                        0.5s endfieldCNAnimDelay(.16s) steps(1) forwards,
+                    slide_RL
+                        0.8s endfieldCNAnimDelay(.16s) $forceful forwards;
+            }
+            #endfield-cn-chr3-1 { animation-delay:endfieldCNAnimDelay(.16s) }
+            #endfield-cn-chr3-2 { animation-delay:endfieldCNAnimDelay(.2s) }
+        }
+        .g-chr4 {
+            transform: translateX(-0.2px);
+            clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%);
+            animation: expand_DU 0.5s endfieldCNAnimDelay(.5s) forwards;
+            .arknights, .endfield {
+                transform: translateY(10px);
+                animation:
+                    slide_DU
+                        0.8s endfieldCNAnimDelay(.4s) $forceful forwards;
+            }
+            .arknights { --order: 1 }
+            .endfield { --order: 2 }
         }
         //#endregion
     }

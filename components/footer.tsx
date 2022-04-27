@@ -2,14 +2,14 @@ import {FC} from "react";
 import {Box} from "@chakra-ui/react";
 import {motion} from "framer-motion";
 import {AnimFunctions} from "@utils/anims";
+import {joinClasses} from "@utils/common";
 import {HypergryphLogo} from "@components/logo/Hypergryph/Hypergryph";
 import {MountainContourLogo} from "@components/logo/MountainContour/MountainContour";
-
-import terrainStyles from "./terrain.module.scss";
-import {joinClasses} from "@utils/common";
 import {Anchor} from "@components/anchor";
 
+import terrainStyles from "./terrain.module.scss";
 const {Forceful, SlowDown} = AnimFunctions;
+
 export const Footer:  FC = () => {
     const LogoAnimConfig = (delay = 0) => ({
         initial: {
@@ -39,7 +39,7 @@ export const Footer:  FC = () => {
                 className={"rel flex a-flex-center j-flex-space-between"}
             >
                 <TerrainMap />
-                <Box w={340} className={"fh flex"} paddingLeft={50} zIndex={2}>
+                <Box w={350} className={"fh flex"} paddingLeft={(70 / 1920 * 100) + "%"} zIndex={2}>
                     <HypergryphLogo
                         woke
                         link
@@ -86,7 +86,7 @@ const TerrainMap = () => {
             }}
             className={"fh abs t0 l0 overflow-hidden z0"}
         >
-            <svg viewBox="1 30 485 1140.294" width="700" opacity={.5}>
+            <svg className={terrainStyles["terrain-view"]} viewBox="1 30 485 1140.294" width="700" opacity={.5}>
                 <defs>
                     <linearGradient id={"footer__terrain-cover"}>
                         <stop offset={"0%"} stopColor={"#00000000"}/>

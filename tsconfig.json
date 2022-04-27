@@ -24,6 +24,7 @@
           "@assets/*": ["./public/*"],
           "@struct/*" : ["./struct/*"],
           "@styles/*" : ["./styles/*"],
+          "@states/*" : ["./states/*"],
       }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],
