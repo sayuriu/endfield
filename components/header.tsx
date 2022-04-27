@@ -61,10 +61,10 @@ export const Header: FC<HeaderProps> = ({ lang }) => {
                 <Settings
                     onLangChange={(newLang) => {
                         setLogoOpacity(0);
-                        setTimeout(() => {
+                        setTimeout(async () => {
+                            await router.push({href: '/', query: {lang: newLang}});
                             setLogoOpacity(1);
-                            router.push({href: '/', query: {lang: newLang}});
-                        }, 470);
+                        }, 450);
                     }}/>
             </Box>
         </motion.div>
