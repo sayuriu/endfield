@@ -52,7 +52,8 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
         {
             router.query.lang = 'en';
             intro ? router.query.intro = intro : null;
-            void router.push(router);
+
+            void router.push(router, router.pathname, { shallow: true });
             return () => {};
         }
 
