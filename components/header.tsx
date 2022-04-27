@@ -64,7 +64,7 @@ export const Header: FC<HeaderProps> = ({ lang }) => {
                         setTimeout(() => {
                             setLogoOpacity(1);
                             router.push({href: '/', query: {lang: newLang}});
-                        }, 400);
+                        }, 470);
                     }}/>
             </Box>
         </motion.div>
@@ -73,6 +73,7 @@ export const Header: FC<HeaderProps> = ({ lang }) => {
 
 const Settings: FC<{ onLangChange: (lang: string) => void }> = ({ onLangChange }) => {
     const lang = ["cn", "en"];
+    const router = useRouter();
     const [langOptionVisible, setLangOptionVisible] = useState(false);
     const variants = {
         visible: {
@@ -114,10 +115,13 @@ const Settings: FC<{ onLangChange: (lang: string) => void }> = ({ onLangChange }
                         initial={"hidden"}
                         animate={"langBtn"}
                         key={i}
-                        className={""}
+                        className={_lang === router.query.lang ? "no-pointer" : ""}
                         onClick={() => onLangChange(_lang)}
                     >
-                        {_lang}
+                        {_lang === router.query.lang ?
+                            <s>{_lang}</s> :
+                            _lang
+                        }
                     </motion.button>
                 ))}
             </motion.div>
