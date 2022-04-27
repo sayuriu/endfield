@@ -62,7 +62,8 @@ export const Header: FC<HeaderProps> = ({ lang }) => {
                     onLangChange={(newLang) => {
                         setLogoOpacity(0);
                         setTimeout(async () => {
-                            await router.push({href: '/', query: {lang: newLang}});
+                            router.query.lang = newLang;
+                            await router.push(router);
                             setLogoOpacity(1);
                         }, 450);
                     }}/>
