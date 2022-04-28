@@ -1,7 +1,7 @@
 import {HasAnimation, joinClasses, whichWider} from "@utils/common";
 import {FC, useEffect, useRef, useState} from "react";
 import { motion } from "framer-motion";
-import {AnimFunctions} from "@utils/anims";
+import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
 import styles from "./CN-big.module.scss";
 

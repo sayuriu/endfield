@@ -1,10 +1,10 @@
-import {FC} from "react";
+import { FC } from "react";
 import {HasAnimation, joinClasses} from "@utils/common";
 import styles from "./EN-small.module.scss";
-import {AnimFunctions} from "@utils/anims";
+import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
 import { motion } from "framer-motion";
-import {LogoSmallProps} from "@components/logo/logo.types";
+import { LogoSmallProps } from "@components/logo/logo.types";
 
 export const LogoSmall_EN: FC<HasAnimation & LogoSmallProps> = ({ dontAnimateChild, opacity }) => {
     return (

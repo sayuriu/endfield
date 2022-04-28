@@ -2,7 +2,7 @@ import styles from './Hypergryph.module.scss';
 import { FC } from "react";
 import {HasAnimation, Logo, Nullable, OverridableStyle} from "@utils/common";
 import {motion, MotionProps} from 'framer-motion';
-import {Anchor} from "@components/anchor";
+import { Anchor } from "@components/anchor";
 
 export const HypergryphLogo: FC<HasAnimation & OverridableStyle & Logo & HGWoke & MotionProps & { link?: boolean }> = ({ overrideStyles, dontAnimateChild= null, noLogoText, woke, link, ...animProps }) => {
     const children = (<>

@@ -1,6 +1,6 @@
 import { motion } from "framer-motion";
-import {FC, ReactNode, useState} from "react";
-import {AnimFunctions} from "@utils/anims";
+import { FC, ReactNode, useEffect, useState } from "react";
+import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
 
 interface AnchorProps {
@@ -15,6 +15,10 @@ export const Anchor: FC<AnchorProps> = ({
     blankTarget = true,
 }) => {
     const [isHovered, setIsHovered] = useState(false);
+    const [isSSR, setIsSSR] = useState(true);
+    useEffect(() => {
+        setIsSSR(false);
+    }, []);
     return <motion.a
         onHoverStart={() => setIsHovered(true)}
         onHoverEnd={() => setIsHovered(false)}
@@ -42,7 +46,7 @@ export const Anchor: FC<AnchorProps> = ({
         target={blankTarget ? "_blank" : "_self"}
         rel={blankTarget ? "noopener noreferrer" : ""}
     >
-        <motion.span
+        {!isSSR && <motion.span
             className={"abs fw fh"}
             initial={{
                 backgroundImage: "linear-gradient(transparent 100%, hsl(213, 0%, 70%) 0%)",
@@ -55,7 +59,7 @@ export const Anchor: FC<AnchorProps> = ({
                 duration: 0.5,
                 ease: Forceful,
             }}
-        />
+        />}
         {children}
     </motion.a>;
 };

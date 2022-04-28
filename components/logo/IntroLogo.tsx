@@ -1,7 +1,7 @@
-import {HypergryphLogo} from "@components/logo/Hypergryph/Hypergryph";
-import {MountainContourLogo} from "@components/logo/MountainContour/MountainContour";
+import { HypergryphLogo } from "@components/logo/Hypergryph/Hypergryph";
+import { MountainContourLogo } from "@components/logo/MountainContour/MountainContour";
 import {HasAnimation, joinClasses} from "@utils/common";
-import {FC} from "react";
+import { FC } from "react";
 
 export const IntroLogo: FC<HasAnimation> = ({dontAnimateChild}) => {
     return (<div

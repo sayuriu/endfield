@@ -1,11 +1,11 @@
-import {FC} from "react";
-import {Box} from "@chakra-ui/react";
-import {motion} from "framer-motion";
-import {AnimFunctions} from "@utils/anims";
-import {joinClasses} from "@utils/common";
-import {HypergryphLogo} from "@components/logo/Hypergryph/Hypergryph";
-import {MountainContourLogo} from "@components/logo/MountainContour/MountainContour";
-import {Anchor} from "@components/anchor";
+import { FC } from "react";
+import { Box } from "@chakra-ui/react";
+import { motion } from "framer-motion";
+import { AnimFunctions } from "@utils/anims";
+import { joinClasses } from "@utils/common";
+import { HypergryphLogo } from "@components/logo/Hypergryph/Hypergryph";
+import { MountainContourLogo } from "@components/logo/MountainContour/MountainContour";
+import { Anchor } from "@components/anchor";
 
 import terrainStyles from "./terrain.module.scss";
 const {Forceful, SlowDown} = AnimFunctions;

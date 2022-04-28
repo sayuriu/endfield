@@ -1,0 +1,18 @@
+/* #region JetBrains */
+@font-face {
+	font-family: JetBrains Mono;
+    /*noinspection CssUnknownTarget*/
+	src: url(/fonts/JetBrainsMono-Regular.ttf) format("truetype");
+	font-style: normal;
+	font-weight: normal;
+}
+
+/* italics */
+@font-face {
+	font-family: JetBrains Mono;
+    /*noinspection CssUnknownTarget*/
+    src: url(/fonts/JetBrainsMono-Italic.ttf) format("truetype");
+	font-style: italic;
+	font-weight: normal;
+}
+/* #endregion */

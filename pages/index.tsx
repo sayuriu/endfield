@@ -1,26 +1,22 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
+import { useAtom } from "jotai";
 import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
-import {atom, useAtom} from "jotai";
 
-import { Nullable } from "@utils/common";
+import { localGet, Nullable, waitAsync } from "@utils/common";
 import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
-import {IntroLogo} from "@components/logo/IntroLogo";
+import { IntroLogo } from "@components/logo/IntroLogo";
 import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big";
+import {AvailableLanguages, Language} from "@states/global";
 
 interface PageProps {
-    lang: Nullable<string>,
+    lang: string,
     intro: Nullable<string>,
-}
-
-function animateSequence(...defs: [() => void, number][]) {
-    for (const [fn, delay] of defs)
-        setTimeout(fn, delay);
 }
 
 function getIntroAnimSpeed(lang: string)
@@ -38,31 +34,20 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
     const [progressPercentage , setProgressPercentage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [logoVisible, setLogoVisible] = useState(false);
-    const [isIntroVisible, setIsIntroVisible] = useState(false);
+    const [introVisible, setIntroVisible] = useState(false);
     const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
 
+    const [currentLang, setCurrentLang] = useAtom(Language);
+
     const router = useRouter();
-    if (!lang && 'lang' in router.query)
-        lang = router.query.lang?.toString() ?? null;
     if (!intro && 'intro' in router.query)
         intro = router.query.intro?.toString() ?? null;
 
     useEffect(() => {
-        if (!['en', 'cn'].includes(lang ?? ''))
-        {
-            router.query.lang = 'en';
-            intro ? router.query.intro = intro : null;
-
-            void router.push(router, router.pathname, { shallow: true });
-            return () => {};
-        }
-
+        if (currentLang !== lang) setCurrentLang(lang);
         let animateLogo = true;
-        if (intro === 'true')
-        {
-            if (window)
-                document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());
-        }
+        if (intro === 'true' || localGet('intro') === 'true')
+            document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());
         else
         {
             let time = localStorage.getItem('endfield-time');
@@ -85,22 +70,21 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
         }
 
         setDontAnimate(animateLogo ? null : true);
-        animateSequence(
-            [() => setIsIntroVisible(true), 500],
-            [() => setIsIntroVisible(false), 3500],
-            [() => setLogoVisible(true), 4000],
-            [() => {
-                setProgressPercentage(100);
-                setTimeout(() => setLogoVisible(false), 1000);
-            }, animateLogo ? 9500 : 4200],
-            [() => setIsLoading(false), animateLogo ? 10800 : 5500]
-        );
+        waitAsync(500).then(() => setIntroVisible(true));
+        waitAsync(3500).then(() => setIntroVisible(false));
+        waitAsync(4000).then(() => setLogoVisible(true));
+        waitAsync(animateLogo ? 9500 : 4200).then(async () => {
+            setProgressPercentage(100);
+            await waitAsync(1000);
+            setLogoVisible(false);
+        });
+        waitAsync(animateLogo ? 10800 : 5500).then(() => setIsLoading(false));
     }, []);
 
     return <div className="rel fw fh flex j-flex-center a-flex-center">
         <AnimatePresence>
             {/*{isLoading && <InitProgressBar progress={progressPercentage}/>}*/}
-            {isIntroVisible && <motion.div
+            {introVisible && <motion.div
                 initial={{opacity: 0}}
                 animate={{opacity: 1}}
                 exit={{opacity: 0}}
@@ -112,10 +96,10 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
             >
                 <IntroLogo/>
             </motion.div>}
-            {logoVisible && lang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
-            {logoVisible && lang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
+            {logoVisible && currentLang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            {logoVisible && currentLang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
             {!isLoading && <>
-                <Header key="header" lang={lang}/>
+                <Header key="header"/>
                 <Body key="body"/>
                 <Footer key="footer"/>
             </>}
@@ -125,9 +109,12 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
 
 export async function getServerSideProps(context: { query: Record<string, string | undefined> })
 {
+    let lang = 'en';
+    if (AvailableLanguages.includes(context.query.lang ?? ''))
+        lang = context.query.lang as string;
     return {
         props:{
-            lang: context.query.lang ?? null,
+            lang,
             intro: context.query.intro ?? null,
         }
     };

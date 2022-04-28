@@ -1,13 +1,13 @@
-import {FC} from "react";
+import { FC } from "react";
 import {HasAnimation, joinClasses} from "@utils/common";
 import { motion } from "framer-motion";
-import {AnimFunctions} from "@utils/anims";
+import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
 import styles from "./CN-small.module.scss";
-import {LogoSmallProps} from "@components/logo/logo.types";
+import { LogoSmallProps } from "@components/logo/logo.types";
 
 
-export const LogoSmall_CN: FC<HasAnimation & LogoSmallProps> = ({ dontAnimateChild, opacity }) => {
+export const LogoSmall_CN: FC<HasAnimation & LogoSmallProps> = ({ dontAnimateChild, opacity = 1 }) => {
     return (
         <motion.svg
             fill="none"
