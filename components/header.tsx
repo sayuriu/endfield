@@ -109,7 +109,7 @@ const settingsUIVariant = {
         // clipPath: "polygon(0 0, 0 0, 100% 0, 100% 0)",
         opacity: 0,
         transition: {
-            delay: 0.3,
+            delay: 0.12,
             duration: 0.5,
             ease: Forceful,
             when: "afterChildren",
@@ -157,6 +157,7 @@ const childStyles = {
 
 const Settings: FC<SettingsProps> = ({ onLangChange }) => {
     const lang = ["cn", "en"];
+    const [visible, setVisible] = useState(true);
     return (
         <motion.div
             className={"abs r0 t0 flex flex-col"}
@@ -165,7 +166,6 @@ const Settings: FC<SettingsProps> = ({ onLangChange }) => {
             animate={"UIVisible"}
             exit={"UIHidden"}
             style={{ background: "#fff", color: "#000" }}
-            layout
         >
             <motion.div
                 className={"fw flex a-flex-center j-flex-space-between"}
@@ -173,6 +173,7 @@ const Settings: FC<SettingsProps> = ({ onLangChange }) => {
                 variants={settingsUIVariant}
                 initial={"childHidden"}
                 animate={"childVisible"}
+                exit={"childHidden"}
             >
                 <Box as={"p"} fontFamily={"Jetbrains Mono"} p={4}>Language</Box>
                 <Box fontFamily={"Jetbrains Mono"} p={4}>
