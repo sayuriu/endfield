@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 
 import { localGet, Nullable, waitAsync } from "@utils/common";
-import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
+// import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
@@ -16,7 +16,7 @@ import {AvailableLanguages, Language} from "@states/global";
 
 interface PageProps {
     lang: string,
-    intro: Nullable<string>,
+    fullIntro: Nullable<string>,
 }
 
 function getIntroAnimSpeed(lang: string)
@@ -30,8 +30,8 @@ function getIntroAnimSpeed(lang: string)
     }
 }
 
-const Home: NextPage<PageProps> = ({ lang, intro }) => {
-    const [progressPercentage , setProgressPercentage] = useState(0);
+const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
+    // const [progressPercentage , setProgressPercentage] = useState(0);
     const [isLoading, setIsLoading] = useState(true);
     const [logoVisible, setLogoVisible] = useState(false);
     const [introVisible, setIntroVisible] = useState(false);
@@ -40,13 +40,21 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
     const [currentLang, setCurrentLang] = useAtom(Language);
 
     const router = useRouter();
-    if (!intro && 'intro' in router.query)
-        intro = router.query.intro?.toString() ?? null;
+    if (!fullIntro && 'fullIntro' in router.query)
+        fullIntro = router.query.fullIntro?.toString() ?? null;
 
     useEffect(() => {
         if (currentLang !== lang) setCurrentLang(lang);
+        if (localGet('fullIntro') === 'true')
+            void router.push({
+                pathname: '/',
+                query: {
+                    fullIntro: 'true',
+                    lang
+                }
+            });
         let animateLogo = true;
-        if (intro === 'true' || localGet('intro') === 'true')
+        if (fullIntro === 'true' || localGet('fullIntro') === 'true')
             document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());
         else
         {
@@ -74,7 +82,7 @@ const Home: NextPage<PageProps> = ({ lang, intro }) => {
         waitAsync(3500).then(() => setIntroVisible(false));
         waitAsync(4000).then(() => setLogoVisible(true));
         waitAsync(animateLogo ? 9500 : 4200).then(async () => {
-            setProgressPercentage(100);
+            // setProgressPercentage(100);
             await waitAsync(1000);
             setLogoVisible(false);
         });
@@ -115,7 +123,7 @@ export async function getServerSideProps(context: { query: Record<string, string
     return {
         props:{
             lang,
-            intro: context.query.intro ?? null,
+            fullIntro: context.query.fullIntro ?? null,
         }
     };
 }
