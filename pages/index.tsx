@@ -45,7 +45,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
 
     useEffect(() => {
         if (currentLang !== lang) setCurrentLang(lang);
-        if (localGet('fullIntro') === 'true')
+        if (localGet('fullIntro') === 'true' && fullIntro === null)
             void router.push({
                 pathname: '/',
                 query: {
@@ -54,7 +54,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                 }
             });
         let animateLogo = true;
-        if (fullIntro === 'true' || localGet('fullIntro') === 'true')
+        if (fullIntro === 'true' || (fullIntro === null && localGet('fullIntro') === 'true'))
             document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());
         else
         {

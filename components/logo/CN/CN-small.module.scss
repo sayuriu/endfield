@@ -44,17 +44,17 @@ $logo-anim-delay: 0s;
                 transform: translateY(10px);
                 animation:
                     opacity_spawn
-                        0.5s endfieldCNAnimDelay(.1s) steps(1) forwards,
+                        0.75s endfieldCNAnimDelay(.1s) steps(1) forwards,
                     slide_DU
-                        0.8s endfieldCNAnimDelay(.1s) $forceful forwards;
+                        1.2s endfieldCNAnimDelay(.1s) $forceful forwards;
             }
             #endfield-cn-chr1-stroke-tl-1 {
                 transform: translateX(-10px);
                 animation:
                     opacity_spawn
-                        0.5s endfieldCNAnimDelay() steps(1) forwards,
+                        0.75s endfieldCNAnimDelay() steps(1) forwards,
                     slide_LR
-                        0.8s endfieldCNAnimDelay() $forceful forwards;
+                        1.2s endfieldCNAnimDelay() $forceful forwards;
             }
         }
         .g-chr2 {
@@ -63,9 +63,9 @@ $logo-anim-delay: 0s;
                 transform: translateX(10px);
                 animation:
                     opacity_spawn
-                        0.5s endfieldCNAnimDelay(.08s) steps(1) forwards,
+                        0.75s endfieldCNAnimDelay(.08s) steps(1) forwards,
                     slide_RL
-                        0.8s endfieldCNAnimDelay(.08s) $forceful forwards;
+                        1.2s endfieldCNAnimDelay(.08s) $forceful forwards;
             }
         }
         .g-chr3 {
@@ -74,22 +74,22 @@ $logo-anim-delay: 0s;
                 transform: translateX(10px);
                 animation:
                     opacity_spawn
-                        0.5s endfieldCNAnimDelay(.16s) steps(1) forwards,
+                        0.75s endfieldCNAnimDelay(.2s) steps(1) forwards,
                     slide_RL
-                        0.8s endfieldCNAnimDelay(.16s) $forceful forwards;
+                        1.2s endfieldCNAnimDelay(.2s) $forceful forwards;
             }
             #endfield-cn-chr3-1 { animation-delay:endfieldCNAnimDelay(.16s) }
-            #endfield-cn-chr3-2 { animation-delay:endfieldCNAnimDelay(.2s) }
+            #endfield-cn-chr3-2 { animation-delay:endfieldCNAnimDelay(.26s) }
         }
         .g-chr4 {
             transform: translateX(-0.2px);
             clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%);
-            animation: expand_DU 0.5s endfieldCNAnimDelay(.5s) forwards;
+            animation: expand_DU 1s endfieldCNAnimDelay(.56s) forwards;
             .arknights, .endfield {
                 transform: translateY(10px);
                 animation:
                     slide_DU
-                        0.8s endfieldCNAnimDelay(.4s) $forceful forwards;
+                        0.8s endfieldCNAnimDelay(.5s) $forceful forwards;
             }
             .arknights { --order: 1 }
             .endfield { --order: 2 }

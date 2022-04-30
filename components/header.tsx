@@ -36,20 +36,27 @@ function resolveConfig(lang: Nullable<string>)
 
 export const Header: FC = () => {
     const router = useRouter();
+    const [currentLanguage, setCurrentLanguage] = useAtom(Language);
     const [logoOpacity, setLogoOpacity] = useState(1);
     const [settingsUIVisible, setSettingsUIVisible] = useState(false);
-    const [currentLanguage, setCurrentLanguage] = useAtom(Language);
 
+    let HoverTimeout: Nullable<ReturnType<typeof setTimeout>> = null;
     let ToggleTimeout = false;
-    const handleToggle = (newState: boolean, bypass = false) => {
-        if (ToggleTimeout && !bypass)
+    const handleToggle = (newState: boolean, hover = false) => {
+        if (ToggleTimeout && !hover)
             return;
-        setSettingsUIVisible(newState);
-        if (!bypass)
+        if (!hover)
         {
+            setSettingsUIVisible(newState);
             ToggleTimeout = true;
             setTimeout(() => {
                 ToggleTimeout = false;
+            }, 500);
+        }
+        else {
+            HoverTimeout = setTimeout(() => {
+                setSettingsUIVisible(newState);
+                HoverTimeout = null;
             }, 500);
         }
     };
@@ -78,6 +85,11 @@ export const Header: FC = () => {
                         className={"flex a-flex-center"}
                         fontFamily={"Jetbrains Mono"}
                         onMouseLeave={() => handleToggle(false, true)}
+                        onMouseEnter={() => {
+                            if (HoverTimeout)
+                                clearTimeout(HoverTimeout);
+                            HoverTimeout = null;
+                        }}
                     >
                         <AnimatePresence>
                             {settingsUIVisible &&
@@ -213,7 +225,12 @@ const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
     const router = useRouter();
     const [fullIntro, setFullIntro] = useState(false);
     const [currentLanguage, setCurrentLanguage] = useState(lang);
-    const availableLangs = ["CN", "EN"];
+    const availableLangs = [
+        "CN",
+        "EN",
+        // "JP",
+        // "KR"
+    ];
     const btnVariants = {
         langBtn: {
             opacity: 1,
@@ -300,4 +317,3 @@ const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
         </motion.div>
     );
 };
-
