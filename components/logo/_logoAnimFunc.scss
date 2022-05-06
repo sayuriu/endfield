@@ -1,0 +1,6 @@
+@function StaggeredAnimDelay($baseDelay: 0s, $additionalDelay: 0s) {
+    @return calc(
+        #{$baseDelay} +
+        0.05s * var(--order) + #{$additionalDelay}
+    );
+}

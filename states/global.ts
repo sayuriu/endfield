@@ -10,4 +10,4 @@ export const Language = atom<string, string, void>(
         set(LanguageAtom, newLang);
     },
 );
-export const AvailableLanguages = ['en', 'cn'];
+export const AvailableLanguages = ['en', 'cn', 'jp'];

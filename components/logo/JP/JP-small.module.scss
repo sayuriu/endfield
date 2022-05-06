@@ -1,0 +1,106 @@
+@import "styles/anims";
+@import "styles/orders";
+@import '../logoAnimFunc';
+
+$logo-anim-delay: 0s;
+.logo {
+    path, rect {
+        fill: #fff;
+        &[data-inverse] {
+            fill: #000;
+        }
+    }
+    &:not([data-noanim]) {
+        //#region JP-"Arknights"
+        $arknights-cn-anim-delay: calc(#{$logo-anim-delay} + 0s);
+        .arknights {
+            opacity: 0;
+            transform: translateY(-10px);
+
+            $delay: StaggeredAnimDelay($arknights-cn-anim-delay);
+            animation:
+                opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                slide_UD 0.8s #{$delay} $forceful forwards;
+        }
+        //#endregion
+
+        //#region JP-"Endfield"
+        $endfield-cn-anim-delay: calc(#{$logo-anim-delay} + 0.5s);
+        #chr1,
+        #chr4,
+        #chr5,
+        #chr6,
+        #chr7 {
+            opacity: 0;
+            transform: translateY(-10px);
+
+            $delay: StaggeredAnimDelay($endfield-cn-anim-delay);
+            animation:
+                opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                slide_UD 0.8s #{$delay} $forceful forwards;
+        }
+        #chr2 {
+            $delay: StaggeredAnimDelay($endfield-cn-anim-delay);
+            #chr2-t {
+                opacity: 0;
+                transform: translateY(-10px);
+                animation:
+                    opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                    slide_UD 0.8s #{$delay} $forceful forwards;
+            }
+            #chr2-b {
+                opacity: 0;
+                transform: translateY(10px);
+                animation:
+                    opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                    slide_DU 0.8s #{$delay} $forceful forwards;
+            }
+        }
+        #chr3, #chr8 {
+            $delay: StaggeredAnimDelay($arknights-cn-anim-delay, 0.4s);
+            .main {
+                opacity: 0;
+                transform: translateY(10px);
+
+                animation:
+                    opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                    slide_DU 0.8s #{$delay} $forceful forwards;
+            }
+            .sub-1, .sub-2 {
+                transform-origin: bottom center;
+                transform: scaleY(2) translateY(calc(8px));
+                opacity: 0;
+                @keyframes reset-transform {
+                    to { transform: scaleY(1) translateY(0); }
+                }
+                animation:
+                    reset-transform 0.5s #{$delay} $forceful forwards,
+                    opacity_spawn 0.3s #{$delay} steps(1) forwards,
+            }
+            .sub-1 { animation-delay: calc(#{$delay} + 0.25s); }
+            .sub-2 { animation-delay: calc(#{$delay} + 0.3s); }
+        }
+        #chr9 {
+            $delay: StaggeredAnimDelay($endfield-cn-anim-delay, 0.28s);
+            clip-path: polygon(0 0, 0 0, 100% 0, 100% 0);
+            animation:
+                expand_UD 0.5s #{$delay} $forceful forwards;
+
+            .a { @extend ._1}
+            .e1 { @extend ._2 }
+            .e2 { @extend ._3 }
+            .e3 { @extend ._4 }
+            .a, .e1, .e2, .e3 {
+                $delay: StaggeredAnimDelay($endfield-cn-anim-delay, 0.53s);
+                opacity: 0;
+                transform: translateY(-10px);
+                animation:
+                    opacity_spawn 0.5s #{$delay} steps(1) forwards,
+                    slide_UD 0.8s #{$delay} $forceful forwards;
+            }
+
+        }
+
+        //#endregion
+    }
+}
