@@ -1,0 +1,11 @@
+@keyframes char-stroke {
+    from {
+        stroke: #fff;
+        stroke-width: 0.1px;
+        fill: #000;
+    }
+    to {
+        stroke-width: 0;
+        fill: #fff;
+    }
+}

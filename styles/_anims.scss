@@ -12,6 +12,9 @@ $playback-speed: var(--anim-playback-rate);
     @return calc(#{$timeExpr} * #{$playback-speed});
 }
 
+@keyframes reset-transform { to { transform: translate(0) } }
+@keyframes reset-rotate { to { transform: rotate(0) } }
+
 @keyframes opacity_spawn {
     from { opacity: 0; }
     to { opacity: 1; }
@@ -43,6 +46,10 @@ $playback-speed: var(--anim-playback-rate);
 @keyframes collapse_LR {
     from { clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%) }
     to { clip-path: polygon(100% 0, 100% 0, 100% 100%, 100% 100%) }
+}
+@keyframes expand_RL {
+    from { clip-path: polygon(100% 0, 100% 100%, 100% 100%, 100% 0) }
+    to { clip-path: polygon(100% 0, 100% 100%, 0 100%, 0 0) }
 }
 @keyframes expand_DU {
     from { clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%) }

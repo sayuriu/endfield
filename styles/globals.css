@@ -5,7 +5,7 @@ body {
     padding: 0;
     margin: 0;
     font-family: "JetBrains Mono", Consolas, serif;
-    --anim-playback-rate: 1.55;
+    --anim-playback-rate: 1.33;
     will-change: contents;
     background: #000;
 }

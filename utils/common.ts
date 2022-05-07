@@ -17,6 +17,6 @@ export const localGet = (key: string): Nullable<string> => localStorage.getItem(
 export const localSet = (key: string, value: string): void => localStorage.setItem(key, value);
 export const localRemove = (key: string): void => localStorage.removeItem(key);
 export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'width' : 'height';
-export const joinClasses = (...args: string[]) => args.filter(Boolean).join(' ');
+export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
 export const waitAsync = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));

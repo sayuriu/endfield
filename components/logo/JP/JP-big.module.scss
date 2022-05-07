@@ -1,0 +1,91 @@
+@import 'styles/anims';
+@import 'styles/orders';
+@import '../logoAnimFunc';
+@import './JP.anim';
+
+.logo {
+    width: clamp(700px, 100%, 2000px);
+    height: clamp(400px, 80%, 500px);
+    path, rect {
+        fill: #fff;
+        &[data-inverse] {
+            fill: #000;
+        }
+    }
+    &:not([data-noanim])
+    {
+        $logo-anim-delay: 0s;
+        .arknights {
+            $delay: StaggeredAnimDelay($logo-anim-delay);
+
+            opacity: 0;
+            transform: translateY(-10px);
+
+            animation:
+                opacity_spawn applyPlaybackSpeed(0.5s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                slide_UD applyPlaybackSpeed(0.8s) applyPlaybackSpeed(#{$delay}) $forceful forwards,
+                char-stroke applyPlaybackSpeed(0.5s) applyPlaybackSpeed(calc(#{$delay} + 0.4s)) steps(1) forwards;
+        }
+        .endfield {
+            $delay: StaggeredAnimDelay($logo-anim-delay, 0.5s);
+            opacity: 0;
+            transform: translateY(-10px);
+            animation:
+                opacity_spawn applyPlaybackSpeed(0.5s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                slide_UD applyPlaybackSpeed(0.8s) applyPlaybackSpeed(#{$delay}) $forceful forwards;
+            &.chr2_1, &.chr2_2, &.chr2_3 {
+                $delay: StaggeredAnimDelay($logo-anim-delay, 1.05s);
+            }
+            &.chr1_1, &.chr2_1, &.chr2_2, &.chr2_3 {
+                transform: translateX(-10px);
+                animation:
+                    opacity_spawn applyPlaybackSpeed(0.5s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                    slide_LR applyPlaybackSpeed(0.8s) applyPlaybackSpeed(#{$delay}) $forceful forwards,
+            }
+            &.chr1_2-stroke-long {
+                transform-origin: 25px 31px;
+                transform: rotate(17deg);
+                animation:
+                    opacity_spawn applyPlaybackSpeed(0.2s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                    char-stroke applyPlaybackSpeed(0.5s) applyPlaybackSpeed(calc(#{$delay} - 0.05s)) steps(1) forwards,
+                    reset-rotate applyPlaybackSpeed(0.5s) applyPlaybackSpeed(calc(#{$delay} + 0.5s)) $forceful forwards;
+            }
+            &.chr1_2-stroke-short {
+                $delay: StaggeredAnimDelay($logo-anim-delay, 0.8s);
+                transform-origin: bottom center;
+                transform: scaleY(3);
+                @keyframes reset-transform {
+                    to { transform: scaleY(1) translateY(0); }
+                }
+                animation:
+                    char-stroke applyPlaybackSpeed(0.8s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                    opacity_spawn applyPlaybackSpeed(0.5s) applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                    reset-transform applyPlaybackSpeed(1s) applyPlaybackSpeed(#{$delay}) cubic-bezier(0, 0.84, 0.41, 0.98) forwards;
+            }
+            &.chr1_3-main { animation-delay: applyPlaybackSpeed(calc(#{$delay} + 0.35s)); }
+            &.chr1_3-dot-1 { animation-delay: applyPlaybackSpeed(calc(#{$delay} + 0.45s)); }
+            &.chr1_3-dot-2 { animation-delay: applyPlaybackSpeed(calc(#{$delay} + 0.5s)); }
+            &.chr3_2-main { animation-delay: applyPlaybackSpeed(calc(#{$delay} + 0.25s)); }
+            &.chr3_2-dot-1 { animation-delay: applyPlaybackSpeed(calc(#{$delay} + 0.35s)); }
+            &.chr3_2-dot-2 { animation-delay: applyPlaybackSpeed(calc(#{$delay} + 0.43s)); }
+            &.chr3_1-l {
+                transform: translateY(10px);
+                animation:
+                    opacity_spawn applyPlaybackSpeed(0.5s) applyPlaybackSpeed(calc(#{$delay} + 0.2s)) steps(1) forwards,
+                    slide_DU applyPlaybackSpeed(0.8s) applyPlaybackSpeed(calc(#{$delay} + 0.2s)) $forceful forwards;
+            }
+            &.chr3_1-r { animation-delay: calc(#{$delay} + 0.3s); }
+        }
+        #ak-cn {
+            $delay: StaggeredAnimDelay($logo-anim-delay, 0.01s);
+
+            .arknights-cn { @extend ._2 }
+            .endfield-cn { @extend ._3 }
+            .arknights-cn, .endfield-cn {
+                $delay: StaggeredAnimDelay($logo-anim-delay, calc(2s + var(--order)));
+                animation:
+                    slide_RL applyPlaybackSpeed(1s) applyPlaybackSpeed(#{$delay}) $forceful forwards;
+            }
+        }
+    }
+}

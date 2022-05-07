@@ -13,6 +13,7 @@ import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big";
 import {AvailableLanguages, Language} from "@states/global";
+import { LogoLarge_JP } from "@components/logo/JP/JP-big";
 
 interface PageProps {
     lang: string,
@@ -27,6 +28,8 @@ function getIntroAnimSpeed(lang: string)
             return 1.35;
         case 'cn':
             return 1.545;
+        case 'jp':
+            return 2.3;
     }
 }
 
@@ -92,20 +95,11 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
     return <div className="rel fw fh flex j-flex-center a-flex-center">
         <AnimatePresence>
             {/*{isLoading && <InitProgressBar progress={progressPercentage}/>}*/}
-            {introVisible && <motion.div
-                initial={{opacity: 0}}
-                animate={{opacity: 1}}
-                exit={{opacity: 0}}
-                transition={{
-                    duration: 0.5,
-                    ease: [0.88,-0.07, 0.22, 1.01]
-                }}
-                key="intro-logo"
-            >
-                <IntroLogo/>
-            </motion.div>}
+            {introVisible && <IntroLogo key="intro-logo"/>}
             {logoVisible && currentLang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
             {logoVisible && currentLang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
+            {logoVisible && currentLang === 'jp' && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
+            {/*kr <Component "LogoLargeKR" @child>*/}
             {!isLoading && <>
                 <Header key="header"/>
                 <Body key="body"/>
