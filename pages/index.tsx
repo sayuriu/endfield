@@ -6,13 +6,13 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { localGet, Nullable, waitAsync } from "@utils/common";
 // import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
+import {AvailableLanguages, Language} from "@states/global";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
 import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big";
-import {AvailableLanguages, Language} from "@states/global";
 import { LogoLarge_JP } from "@components/logo/JP/JP-big";
 
 interface PageProps {
@@ -101,9 +101,9 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
             {logoVisible && currentLang === 'jp' && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
             {/*kr <Component "LogoLargeKR" @child>*/}
             {!isLoading && <>
-                <Header key="header"/>
                 <Body key="body"/>
                 <Footer key="footer"/>
+                <Header key="header"/>
             </>}
         </AnimatePresence>
     </div>;

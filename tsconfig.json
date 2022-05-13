@@ -25,6 +25,7 @@
           "@struct/*" : ["./struct/*"],
           "@styles/*" : ["./styles/*"],
           "@states/*" : ["./states/*"],
+          "@lang/*" : ["./lang/*"],
       }
   },
   "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx"],

@@ -1,0 +1,16 @@
+{
+    "footer": {
+        "fanmade": "This project is fan-made and does not represent the official website.",
+        "viewsrc": "View source",
+        "to-offcl": "To official website",
+        "cn-ver": "CN version"
+    },
+    "settings": {
+        "label": "SETTINGS",
+        "full-intro": {
+            "title": "Full intro sequence",
+            "desc": "Plays every 24hr from last login"
+        }
+    },
+    "language": "Language"
+}

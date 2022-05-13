@@ -1,0 +1,16 @@
+{
+    "footer": {
+        "fanmade": "这个项目是粉丝制作的，不代表官方网站。",
+        "viewsrc": "查看源代码",
+        "to-offcl": "前往官方网站",
+        "cn-ver": "中国官方网站"
+    },
+    "settings": {
+        "label": "设置",
+        "full-intro": {
+            "title": "完整的介绍序列",
+            "desc": "从上次访问开始每24小时回放一次"
+        }
+    },
+    "language": "语言"
+}

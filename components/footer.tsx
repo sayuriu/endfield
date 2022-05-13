@@ -1,14 +1,16 @@
-import { FC } from "react";
+import { FC, useEffect } from "react";
 import { Box } from "@chakra-ui/react";
-import { motion } from "framer-motion";
+import { motion, useAnimation } from "framer-motion";
 import { AnimFunctions } from "@utils/anims";
-import { joinClasses } from "@utils/common";
+import { i18n, joinClasses, useLocale } from "@utils/common";
 import { HypergryphLogo } from "@components/logo/Hypergryph/Hypergryph";
 import { MountainContourLogo } from "@components/logo/MountainContour/MountainContour";
 import { Anchor } from "@components/anchor";
 
 import terrainStyles from "./terrain.module.scss";
-const {Forceful, SlowDown} = AnimFunctions;
+import { Language } from "@states/global";
+import { useAtom } from "jotai";
+const { Forceful, SlowDown } = AnimFunctions;
 
 export const Footer:  FC = () => {
     const LogoAnimConfig = (delay = 0) => ({
@@ -24,6 +26,7 @@ export const Footer:  FC = () => {
             delay,
         }
     });
+    const [lang] = useAtom(Language);
     return (
         <motion.div
             className={"abs l0"}
@@ -53,26 +56,59 @@ export const Footer:  FC = () => {
                         {...LogoAnimConfig(.3)}
                     />
                 </Box>
-                <Box
-                    as="p"
-                    p={4}
-                    color={"hsl(213, 0%, 70%)"}
-                    fontFamily={"JetBrains Mono"}
-                    textAlign="right"
-                    zIndex={1}
-                    whiteSpace="nowrap"
-                    maxWidth={"70%"}
-                    isTruncated
-                >
-                    This project is fan-made and does not represent the official website.
-                    <br/>
-                    <Anchor to="https://endfield.hypergryph.global">To official site</Anchor>&thinsp;|&thinsp;
-                    <Anchor to="https://endfield.hypergryph.com">CN ver</Anchor>
-                    <br/>
-                    <Anchor to="https://github.com/sayuriu">@sayuriu</Anchor>
-                    &thinsp;&bull;&thinsp;
-                    <Anchor to="https://github.com/sayuriu/endfield">View source</Anchor>
-                </Box>
+                <FooterText lang={lang}/>
+            </Box>
+        </motion.div>
+    );
+};
+
+const FooterText: FC<{ lang: string }> = ({ lang }) => {
+    const locale = useLocale(lang);
+    const control = useAnimation();
+    const sequence = async () => {
+        await control.start({ opacity: 0 });
+        await control.start({ opacity: 1 });
+    };
+    useEffect(() => {
+        void sequence();
+        return () => {
+            control.start({ opacity: 0 }).then(control.stop);
+        };
+    } , [locale]);
+    return (
+        <motion.div
+            initial={{
+                opacity: 0,
+                display: "contents",
+            }}
+            animate={{
+                opacity: 1,
+            }}
+            transition={{
+                duration: .5,
+                ease: Forceful,
+            }}
+            layout
+        >
+            <Box
+                as="p"
+                p={4}
+                color={"hsl(213, 0%, 70%)"}
+                fontFamily={"JetBrains Mono"}
+                textAlign="right"
+                zIndex={1}
+                whiteSpace="nowrap"
+                maxWidth={"70%"}
+                isTruncated
+            >
+                {locale("footer.fanmade")}
+                <br/>
+                <Anchor to="https://endfield.hypergryph.global">{locale("footer.to-offcl")}</Anchor>&thinsp;|&thinsp;
+                <Anchor to="https://endfield.hypergryph.com">{locale("footer.cn-ver")}</Anchor>
+                <br/>
+                <Anchor to="https://github.com/sayuriu">@sayuriu</Anchor>
+                &thinsp;&bull;&thinsp;
+                <Anchor to="https://github.com/sayuriu/endfield">{locale("footer.viewsrc")}</Anchor>
             </Box>
         </motion.div>
     );

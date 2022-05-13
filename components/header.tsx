@@ -10,7 +10,7 @@ import { LogoSmall_CN } from "@components/logo/CN/CN-small";
 import { LogoSmall_EN } from "@components/logo/EN/EN-small";
 import { Checkbox } from "@components/checkbox";
 import { AvailableLanguages, Language } from "@states/global";
-import { localGet, localSet, Nullable, OverridableStyle } from "@utils/common";
+import { localGet, localSet, Nullable, OverridableStyle, useLocale } from "@utils/common";
 import { LogoSmall_JP } from "@components/logo/JP/JP-small";
 
 function resolveConfig(lang: Nullable<string>)
@@ -142,6 +142,7 @@ interface ISettingsToggle {
     onClick: () => void;
 }
 const SettingsToggle: FC<ISettingsToggle> = ({ active, onClick }) => {
+    const locale = useLocale(useAtom(Language)[0]);
     const [isHover, setIsHover] = useState(false);
     const [isSmall, setIsSmall] = useState(false);
     useEffect(() => {
@@ -179,7 +180,7 @@ const SettingsToggle: FC<ISettingsToggle> = ({ active, onClick }) => {
                             style={{whiteSpace: "nowrap", overflow: "hidden"}}
                             layout
                         >
-                        SETTINGS
+                            {locale("settings.label")}
                         </motion.p>
                     }
                 </AnimatePresence>
@@ -259,6 +260,7 @@ interface ISettings {
 }
 const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
     const [lang] = useAtom(Language);
+    const locale = useLocale(lang);
     const router = useRouter();
     const [fullIntro, setFullIntro] = useState(false);
     const [currentLanguage, setCurrentLanguage] = useState(lang);
@@ -313,7 +315,7 @@ const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
         >
             <Box className={"fw"} h={1} padding={`${window.innerWidth < 720 ? 0 : 82}px 7px 5px 7px`}/>
             <SettingsItem>
-                <Box as={"p"} fontFamily={"Jetbrains Mono"} p={4}>Language</Box>
+                <Box as={"p"} fontFamily={"Jetbrains Mono"} p={4}>{locale("language")}</Box>
                 <Box fontFamily={"Jetbrains Mono"} p={4} className={"flex"}>
                     {availableLangs.map((_lang, i) => {
                         const sameLanguage = _lang.toLowerCase() === currentLanguage;
@@ -334,8 +336,8 @@ const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
                     })}
                 </Box>
             </SettingsItem>
-            <SettingsItem overrideStyles={{ paddingTop: 0, paddingBottom: 8 }}>
-                <Box paddingLeft={4}>Full intro sequence</Box>
+            <SettingsItem overrideStyles={{ paddingTop: 0, paddingBottom: 8, paddingLeft: 0 }}>
+                <Box paddingLeft={5}>{locale("settings.full-intro.title")}</Box>
                 <Box paddingInline={4}>
                     <Checkbox
                         checked={fullIntro}
@@ -345,8 +347,12 @@ const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
                         bg={"#fff"}
                     />
                 </Box>
-                <Box as={"i"} className={"abs"} fontSize={"0.75rem"} top={"73%"} left={4}>
-                    Plays every 24hr from last login
+                <Box
+                    as={"i"}
+                    className={"abs fw txt-algn-center"}
+                    fontSize={"0.75rem"} top={"73%"}
+                >
+                    {locale("settings.full-intro.desc")}
                 </Box>
             </SettingsItem>
             <Box className={"fw"} h={1} padding={"7px"}/>
