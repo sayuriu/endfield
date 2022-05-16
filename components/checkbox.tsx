@@ -65,7 +65,7 @@ export const Checkbox: FC<ICheckbox & OverridableStyle> = (
                         y: 0
                     }}
                     animate={{
-                        x: isChecked ? 150 : 300,
+                        x: isChecked ? 152 : 300,
                         y: isChecked ? 0 : -150,
                     }}
                 />
