@@ -27,10 +27,6 @@ export const Body = () => {
     </Box>);
 };
 
-interface IIndex {
-    index: number;
-}
-
 const Index: FC = () => {
     const [indexSubU, setIndexSubU] = useState(0);
     const [indexMain, setIndexMain] = useState(1);
@@ -45,11 +41,11 @@ const Index: FC = () => {
         indexMainController.set({ y: 830 });
         indexSubLController.set({ y: 1670 });
         indexSubUController.set({ y: -10 });
-        return () => Promise.all([
-            indexMainController.stop(),
-            indexSubLController.stop(),
-            indexSubUController.stop()
-        ]);
+        return () => {
+            indexMainController.stop();
+            indexSubLController.stop();
+            indexSubUController.stop();
+        };
     }, []);
 
     const transition = {
@@ -81,10 +77,9 @@ const Index: FC = () => {
                 indexMainController.start({ y: -10 }),
             ]);
             setIndexMain(indexMain + 1);
-            await Promise.all([
-                indexMainController.set({ y: 830 }),
-                indexSubLController.set({ y: 1670 }),
-            ])
+            indexMainController.set({ y: 830 });
+            indexSubLController.set({ y: 1670 });
+
             setIndexSubU(indexSubU + 1);
             setIndexSubL(indexSubL + 1);
         }
@@ -94,10 +89,9 @@ const Index: FC = () => {
                 indexMainController.start({ y: 1670 })
             ]);
             setIndexMain(indexMain - 1);
-            await Promise.all([
-                indexMainController.set({ y: 830 }),
-                indexSubUController.set({ y: -10 })
-            ]);
+            indexMainController.set({ y: 830 });
+            indexSubUController.set({ y: -10 });
+
             setIndexSubL(indexSubL - 1);
             setIndexSubU(indexSubU - 1);
         }
