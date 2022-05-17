@@ -2,15 +2,23 @@ import Image from 'next/image';
 import { Box } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Language } from "@states/global";
-import { FC, useEffect, useState } from "react";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import { FC, ReactNode, useEffect, useState } from "react";
+import { AnimatePresence, LayoutGroup, motion, MotionProps, useAnimation } from "framer-motion";
 
 import bodyStyles from './body-styles/Body.module.scss';
 import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
+import { emptyFunc, joinClasses, waitAsync } from "@utils/common";
+import SlowDown = AnimFunctions.SlowDown;
 
 export const Body = () => {
     const [currentLanguage] = useAtom(Language);
+    const [currentPage, setCurrentPage] = useState(1);
+
+    const changePage = (to: number) => {
+        if (to === currentPage) return;
+        setCurrentPage(to);
+    };
     useEffect(() => {
         // console.log(currentLanguage);
     }, [currentLanguage]);
@@ -18,27 +26,102 @@ export const Body = () => {
         h="calc(100vh - 176px)"
         w="100vw"
         p={0}
-        className={"rel grid"}
-        bg={"#fff"}
+        className={joinClasses(bodyStyles["content"], "rel grid")}
     >
-        <AnimatePresence>
-            <Index key={"indexPad"}/>
+        <AnimatePresence exitBeforeEnter>
+            <Background key={"backgroundPad"}/>
         </AnimatePresence>
+        <IndexPanel onIndexChange={setCurrentPage} onIndexAnimStart={(from, to) => changePage(to)}/>
+        <RightPanel currentIndex={currentPage}/>
     </Box>);
 };
 
-const Index: FC = () => {
+interface IBackgroundProps {
+
+}
+
+const Background: FC<IBackgroundProps> = () => {
+    return (<motion.div
+        className={joinClasses(bodyStyles["preview-backgound"], "fh z0 overflow-hidden")}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        transition={{ duration: 0.5, ease: Forceful }}
+    >
+        <Image
+            src={"/img/05_HD.jpg"}
+            alt={""}
+            quality={100}
+            priority
+            layout={"fill"}
+            objectFit={"cover"}
+            style={{
+                scale: 1
+            }}
+        />
+    </motion.div>);
+};
+
+interface IIndex {
+    onIndexAnimStart?: (from: number, to: number) => void;
+    onIndexAnimEnd?: (from: number, to: number) => void;
+    onIndexChange?: (index: number) => void;
+}
+const IndexPanel: FC<IIndex> = (
+    {
+        onIndexAnimStart= emptyFunc,
+        onIndexAnimEnd= emptyFunc,
+        onIndexChange= emptyFunc,
+    }
+) => {
+    const [init, setInit] = useState(true);
     const [indexSubU, setIndexSubU] = useState(0);
     const [indexMain, setIndexMain] = useState(1);
     const [indexSubL, setIndexSubL] = useState(2);
+    const [indexPolygon, setIndexPolygon] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
 
     const indexMainController = useAnimation();
     const indexSubLController = useAnimation();
     const indexSubUController = useAnimation();
 
+    const InnerPolygonVariants = {
+        0: { d: "M0,0V928H0L0,0Z" },
+        1: { d: "M0,28V928H175L425,0Z" },
+        2: { d: "M0,28V928H425L175,0Z" },
+        3: { d: "M0,28V928H280L280,0Z" }
+    };
+
+    const OuterPolygonVariants = {
+        0: { d: "M0,0V928H0L0,0Z" },
+        1: { d: "M0,28V928H240L490,0" },
+        2: { d: "M0,28V928H490L240,0" },
+        3: { d: "M0,28V928H310L310,0Z" }
+    };
+
+    const IndexTextVariants = {
+        0: { transform: "translate(220px, 600px) rotate(-74deg)" },
+        1: { transform: "translate(220px, 600px) rotate(-74deg)" },
+        2: { transform: "translate(250px, 600px) rotate(-105deg)" },
+        3: { transform: "translate(220px, 600px) rotate(-90deg)" },
+    };
+
+    const transition = {
+        duration: init ? 1 : 2,
+        ease: Forceful,
+    };
+
     useEffect(() => {
-        indexMainController.set({ y: 830 });
+        setIndexPolygon(indexMain);
+        onIndexChange(indexMain);
+        indexMainController.set({ y: 830, x: -200 , transition: { duration: 1.2, ease: SlowDown }});
+        void indexMainController.start({ x: 0 });
+        waitAsync(1000).then(
+            () => {
+                indexMainController.set({ transition });
+                setInit(false);
+            }
+        );
         indexSubLController.set({ y: 1670 });
         indexSubUController.set({ y: -10 });
         return () => {
@@ -48,10 +131,14 @@ const Index: FC = () => {
         };
     }, []);
 
-    const transition = {
-        duration: 0.5,
-        ease: Forceful,
+    const indexTextConfig = {
+        fontFamily: "Jetbrains Mono",
+        fontStyle: "bold",
+        fontSize: 62,
+        fill: "#fff",
+        transition,
     };
+
     const indexNumConfig = {
         className: "no-pointer",
         stroke: "#1D1D1D",
@@ -62,79 +149,156 @@ const Index: FC = () => {
         x: -180,
     };
 
-    const HandleScroll = (event: WheelEvent) => {
+    const HandleScroll = async (event: WheelEvent) => {
         if (isAnimating) return;
-        const down = event.deltaY < 0;
-        //               LOWER_INDEX_BOUND           UPPER_INDEX_BOUND
-        if ((indexMain < 2 && !down) || (indexMain > 2 && down)) return;
-        shiftNumberSequence(down);
+        const down = event.deltaY > 0;
+        //                                                LOWER_INDEX_BOUND           UPPER_INDEX_BOUND
+        await shiftNumberSequence(down, (indexMain < 2 && !down) || (indexMain > 2 && down));
     };
-    const shiftNumberSequence = async (increment: boolean) => {
+    const shiftNumberSequence = async (increment: boolean, wrap = false) => {
         setIsAnimating(true);
-        if (increment) {
-            await Promise.all([
+        const oldValue = indexMain;
+        const newValue = wrap ? (increment ? 1 : 3) : (oldValue + (increment ? 1 : -1));
+        onIndexAnimStart(oldValue, newValue);
+        if (wrap) {
+            increment ? setIndexSubL(newValue) : setIndexSubU(newValue);
+        }
+        setIndexPolygon(newValue);
+        await Promise.all(
+        increment ?
+            [
                 indexSubLController.start({ y: 830 }),
                 indexMainController.start({ y: -10 }),
-            ]);
-            setIndexMain(indexMain + 1);
-            indexMainController.set({ y: 830 });
-            indexSubLController.set({ y: 1670 });
-
-            setIndexSubU(indexSubU + 1);
-            setIndexSubL(indexSubL + 1);
-        }
-        else {
-            await Promise.all([
+            ] :
+            [
                 indexSubUController.start({ y: 830 }),
                 indexMainController.start({ y: 1670 })
-            ]);
-            setIndexMain(indexMain - 1);
-            indexMainController.set({ y: 830 });
-            indexSubUController.set({ y: -10 });
-
-            setIndexSubL(indexSubL - 1);
-            setIndexSubU(indexSubU - 1);
-        }
+            ]
+        );
+        await waitAsync(20);
+        setIndexMain(newValue);
+        onIndexChange(newValue);
+        indexMainController.set({ y: 830 });
+        increment ? indexSubLController.set({ y: 1670 }) : indexSubUController.set({ y: -10 });
+        setIndexSubL(newValue + 1);
+        setIndexSubU(newValue - 1);
         setIsAnimating(false);
+        onIndexAnimEnd(oldValue, newValue);
+        return Promise.resolve();
+    };
+    const commonPolygonProps = {
+        animate: indexPolygon.toString(),
+        transition,
+        initial: "0",
     };
     return (
-        <motion.svg className={"fh"} layout viewBox="0 29 520 880" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <g id="Rectangle 1" filter="url(#filter0_bd_140_3)">
-                <path d="M-1 29H495L233.935 935.347H-1V29Z" fill="white" fillOpacity="0.47" />
+        <motion.svg
+            className={joinClasses("fh z1", bodyStyles["index-panel"])}
+            layout
+            viewBox="0 29 520 880"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+        >
+            <motion.path
+                filter="url(#filter0_bd_140_3)"
+                fill="white"
+                fillOpacity="0.47"
+                variants={OuterPolygonVariants}
+                {...commonPolygonProps}
+            />
+            <motion.path
+                filter="url(#filter0_d_116_13)"
+                onWheel={(e) => HandleScroll(e as unknown as WheelEvent)}
+                fill="black"
+                variants={InnerPolygonVariants}
+                {...commonPolygonProps}
+            />
+            <g clipPath={"url(#index__inner-poly)"}>
+                <motion.text
+                    {...indexNumConfig}
+                    initial={{ y: -10 }}
+                    animate={indexSubUController}
+                    transition={transition}
+                >
+                    {indexSubU}
+                </motion.text>
+                <motion.text
+                    {...indexNumConfig}
+                    animate={indexMainController}
+                    transition={transition}
+                >
+                    {indexMain}
+                </motion.text>
+                <motion.text
+                    {...indexNumConfig}
+                    animate={indexSubLController}
+                    transition={transition}
+                >
+                    {indexSubL}
+                </motion.text>
+                <motion.g
+                    id={"label"}
+                    variants={IndexTextVariants}
+                    initial={"0"}
+                    animate={indexPolygon.toString()}
+                    transition={transition}
+                >
+                    <AnimatePresence>
+                        {
+                            indexPolygon === 1 &&
+                            <motion.text
+                                initial={{ x: -700 }}
+                                animate={{ x: 0 }}
+                                exit={{ x: 1300 }}
+                                {...indexTextConfig}
+                            >
+                                OVERVIEW
+                            </motion.text>
+                        }
+                    </AnimatePresence>
+                    <AnimatePresence>
+                        {
+                            indexPolygon === 2 &&
+                            <g transform={"rotate(180)"}>
+                                <motion.text
+                                    initial={{ x: 400 }}
+                                    animate={{ x: -500 }}
+                                    exit={{ x: -1400 }}
+                                    {...indexTextConfig}
+                                >
+                                    <tspan x={188}>PROTOCOL FIELD</tspan>
+                                    <tspan x={0} dy={60}>RECOVERY DEPARTMENT</tspan>
+                                </motion.text>
+                            </g>
+                        }
+                    </AnimatePresence>
+                    <AnimatePresence>
+                        {
+                            indexPolygon === 3 &&
+                            <motion.text
+                                initial={{ x: -1050 }}
+                                animate={{ x: -150 }}
+                                exit={{ x: 900 }}
+                                {...indexTextConfig}
+                            >
+                                COORDINATE RECORDS
+                            </motion.text>
+                        }
+                    </AnimatePresence>
+                </motion.g>
             </g>
-                <g clipPath={"url(#index__inner-poly)"}>
-                    <path id="Rectangle 3" onWheel={(e) => HandleScroll(e as unknown as WheelEvent)} filter="url(#filter1_d_140_3)" d="M0 29H419.424L162.007 935.694L0 935.694V29Z" fill="black" />
-                    <motion.text
-                        {...indexNumConfig}
-                        initial={{ y: -10 }}
-                        animate={indexSubUController}
-                        transition={transition}
-                    >
-                        {indexSubU}
-                    </motion.text>
-                    <motion.text
-                        {...indexNumConfig}
-                        animate={indexMainController}
-                        transition={transition}
-                    >
-                        {indexMain}
-                    </motion.text>
-                    <motion.text
-                        {...indexNumConfig}
-                        animate={indexSubLController}
-                        transition={transition}
-                    >
-                        {indexSubL}
-                    </motion.text>
-                    <g id={"label"}>
-                        <text>OVERVIEW</text>
-                        <text>PROTOCOL FIELD RECOVERYY DEPARTMENT</text>
-                        <text>COORDINATE RECORDS</text>
-                    </g>
-                </g>
+            <text
+                transform="rotate(90) translate(370 0)"
+                {...Object.assign(indexTextConfig, { fontSize: 20 })}
+            >
+                {"<-SCROLL->"}
+            </text>
             <defs>
                 <clipPath id={"index__inner-poly"}>
-                    <path d="M0 29H419.424L162.007 935.694L0 935.694V29Z"/>
+                    <motion.path
+                        variants={InnerPolygonVariants}
+                        {...commonPolygonProps}
+                    />
                 </clipPath>
                 <filter id="filter0_bd_140_3" x="-30" y="0" width="554" height="964.347" filterUnits="userSpaceOnUse"
                         colorInterpolationFilters="sRGB">
@@ -150,17 +314,117 @@ const Index: FC = () => {
                     <feBlend mode="normal" in2="effect1_backgroundBlur_140_3" result="effect2_dropShadow_140_3" />
                     <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_140_3" result="shape" />
                 </filter>
-                <filter id="filter1_d_140_3" x="-4" y="25" width="427.424" height="914.694" filterUnits="userSpaceOnUse"
-                        colorInterpolationFilters="sRGB">
-                    <feFlood floodOpacity="0" result="BackgroundImageFix" />
-                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
-                                   result="hardAlpha" />
-                    <feOffset />
-                    <feGaussianBlur stdDeviation="2" />
-                    <feComposite in2="hardAlpha" operator="out" />
-                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0" />
-                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_140_3" />
-                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_140_3" result="shape" />
+                <filter id="filter0_d_116_13" x="-1" y="0" width="427.424" height="914.694" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                    <feOffset dx="3"/>
+                    <feGaussianBlur stdDeviation="2"/>
+                    <feComposite in2="hardAlpha" operator="out"/>
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                    <feBlend mode="normal" in2="BackgroundImageFix" result="effect1_dropShadow_116_13"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect1_dropShadow_116_13" result="shape"/>
+                </filter>
+            </defs>
+        </motion.svg>
+    );
+};
+
+const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
+    const [init, setInit] = useState(true);
+    const [indexPolygon, setIndexPolygon] = useState(0);
+    useEffect(() => {
+        setIndexPolygon(currentIndex);
+        waitAsync(1000).then(() => setInit(false));
+    }, []);
+    const transition = {
+        duration: init ? 1.5 : 2,
+        ease: Forceful,
+    };
+    const OuterPolygonVariants = {
+        0: {
+            d: "M800,0H800V907H800Z",
+            fillOpacity: 0,
+        },
+        1: {
+            d: "M250,0H800V907H4Z",
+            fillOpacity: 0.47,
+        },
+        2: {
+            d: "M4,0H800V907H250Z",
+            fillOpacity: 0.47,
+        },
+        3: {
+            d: "M430,0H800V907H430Z",
+            fillOpacity: 0.05,
+        },
+    };
+    const InnerPolygonVariants = {
+        0: {
+            d: "M800,0H800V907H800Z",
+            fillOpacity: 0,
+        },
+        1: {
+            d: "M300,0H800V907H54Z",
+            fillOpacity: 0.5,
+        },
+        2: {
+            d: "M54,0H800V907H300Z",
+            fillOpacity: 0.5,
+        },
+        3: {
+            d: "M480,0H800V907H480Z",
+            fillOpacity: 0.1,
+        },
+    };
+
+    const commonPolygonProps = {
+        animate: (init ? indexPolygon : currentIndex).toString(),
+        initial: "0",
+        fill: "#fff",
+        transition,
+    };
+
+    return (
+        <motion.svg
+            viewBox="0 0 800 907"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+            className={joinClasses("fh z1", bodyStyles["right-panel"])}
+        >
+            <motion.path
+                filter="url(#filter0_bd_186_4)"
+                variants={OuterPolygonVariants}
+                {...commonPolygonProps}
+            />
+            <motion.path
+                filter="url(#filter1_bd_186_4)"
+                variants={InnerPolygonVariants}
+                {...commonPolygonProps}
+            />
+            <defs>
+                <filter id="filter0_bd_186_4" x="0.290833" y="-3.13477" width="800" height="919" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+                    <feGaussianBlur in="BackgroundImage" stdDeviation="2"/>
+                    <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_186_4"/>
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                    <feOffset dx="-4"/>
+                    <feGaussianBlur stdDeviation="5"/>
+                    <feComposite in2="hardAlpha" operator="out"/>
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                    <feBlend mode="normal" in2="effect1_backgroundBlur_186_4" result="effect2_dropShadow_186_4"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_186_4" result="shape"/>
+                </filter>
+                <filter id="filter1_bd_186_4" x="28.0472" y="-20.1091" width="800" height="949" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
+                    <feFlood floodOpacity="0" result="BackgroundImageFix"/>
+                    <feGaussianBlur in="BackgroundImage" stdDeviation="10.5"/>
+                    <feComposite in2="SourceAlpha" operator="in" result="effect1_backgroundBlur_186_4"/>
+                    <feColorMatrix in="SourceAlpha" type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0" result="hardAlpha"/>
+                    <feOffset dx="-2"/>
+                    <feGaussianBlur stdDeviation="2"/>
+                    <feComposite in2="hardAlpha" operator="out"/>
+                    <feColorMatrix type="matrix" values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.25 0"/>
+                    <feBlend mode="normal" in2="effect1_backgroundBlur_186_4" result="effect2_dropShadow_186_4"/>
+                    <feBlend mode="normal" in="SourceGraphic" in2="effect2_dropShadow_186_4" result="shape"/>
                 </filter>
             </defs>
         </motion.svg>

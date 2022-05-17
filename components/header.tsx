@@ -75,7 +75,7 @@ export const Header: FC = () => {
     return (
         <AnimatePresence>
             <motion.div
-                className={"abs l0"}
+                className={"abs l0 z5"}
                 initial={{ top: -90 }}
                 animate={{ top: 0 }}
                 transition={{ duration: 0.5, ease: Forceful }}
@@ -310,7 +310,10 @@ const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
             animate={["visible", window.innerWidth < 720 ? "visibleSmall" : ""]}
             exit={"hidden"}
             className={"abs t0 r0 flex flex-col"}
-            style={{ background: "#fff", mixBlendMode: window.innerWidth < 720 ? "exclusion" : "normal" }}
+            style={{
+                background: "#fff",
+                // mixBlendMode: window.innerWidth < 720 ? "exclusion" : "normal"
+            }}
             layout
         >
             <Box className={"fw"} h={1} padding={`${window.innerWidth < 720 ? 0 : 82}px 7px 5px 7px`}/>

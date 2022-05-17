@@ -24,7 +24,7 @@ export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'widt
 export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
 export const waitAsync = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
-
+export const emptyFunc = () => {};
 
 const lang_map = {
     en: lang_en,

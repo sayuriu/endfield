@@ -1,0 +1,9 @@
+.preview-backgound, .index-panel {
+    grid-column-start: 1;
+    grid-row-start: 1;
+}
+
+.right-panel {
+    grid-row-start: 1;
+    margin-left: auto;
+}

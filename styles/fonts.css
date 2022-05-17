@@ -6,6 +6,13 @@
 	font-style: normal;
 	font-weight: normal;
 }
+@font-face {
+	font-family: JetBrains Mono;
+    /*noinspection CssUnknownTarget*/
+	src: url(/fonts/JetBrainsMono-Bold.ttf) format("truetype");
+	font-style: normal;
+	font-weight: bold;
+}
 
 /* italics */
 @font-face {
