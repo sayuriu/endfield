@@ -21,6 +21,7 @@ a {
     text-decoration: none;
 }
 
-* {
+*[data-projection-id] {
+    will-change: contents;
     box-sizing: border-box;
 }

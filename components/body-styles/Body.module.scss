@@ -1,9 +1,21 @@
-.preview-backgound, .index-panel {
+.preview-background, .index-panel {
     grid-column-start: 1;
     grid-row-start: 1;
 }
 
 .right-panel {
     grid-row-start: 1;
+    grid-column-start: 2;
     margin-left: auto;
+}
+
+.index-panel, .right-panel {
+    text, tspan {
+        pointer-events: none;
+    }
+}
+
+.desc-1, .desc-1-title {
+    grid-row-start: 1;
+    grid-column-start: 2;
 }

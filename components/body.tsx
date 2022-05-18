@@ -10,6 +10,7 @@ import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
 import { emptyFunc, joinClasses, waitAsync } from "@utils/common";
 import SlowDown = AnimFunctions.SlowDown;
+import SpeedUp = AnimFunctions.SpeedUp;
 
 export const Body = () => {
     const [currentLanguage] = useAtom(Language);
@@ -28,38 +29,177 @@ export const Body = () => {
         p={0}
         className={joinClasses(bodyStyles["content"], "rel grid")}
     >
-        <AnimatePresence exitBeforeEnter>
-            <Background key={"backgroundPad"}/>
-        </AnimatePresence>
+        <Slideshow interval={5000} imageURLs={["/img/05_HD.jpg"]}/>
         <LeftPanel onIndexChange={setCurrentPage} onIndexAnimStart={(from, to) => changePage(to)}/>
         <RightPanel currentIndex={currentPage}/>
+        <AnimatePresence>
+            {currentPage === 1 && <>
+                <Screen1_Title/>
+                <Screen1_Info/>
+            </>}
+        </AnimatePresence>
     </Box>);
 };
 
-interface IBackgroundProps {
+const DescriptionToggleBtn: FC<{ onClick: (active: boolean) => void, initial: boolean }> = ({ onClick, initial }) => {
+    const [isOpen, setIsOpen] = useState(initial);
+    const HandleClick = () => {
+        setIsOpen(!isOpen);
+        onClick(isOpen);
+    };
+    return (
+        <motion.button
+            animate={{
+                backgroundColor: "#D9D9D9",
+                boxShadow: "#000 0px 0px 20px 0px",
+            }}
+            className={"fw z1"}
+            layout
+            onClick={HandleClick}
+        >
+            <Box
+                as={"p"}
+                w={"100%"}
+                fontFamily={"Oswald"}
+                fontWeight={"bold"}
+                color={"#000"}
+                textAlign={"left"}
+                p={"0.8ch"}
+                pl={"2ch"}
+            >
+                {isOpen ? "MORE" : "LESS"}
+            </Box>
+        </motion.button>
+    );
+};
 
+const Screen1_Title = () => {
+    const [isExiting, setIsExiting] = useState(false);
+    useEffect(() => () => {
+        setIsExiting(true);
+    }, []);
+    const transition = {
+        duration: isExiting ? 1.55 : 1.7,
+        ease: isExiting ? SpeedUp : Forceful,
+    };
+    return (
+        <motion.div
+            initial={{
+                mixBlendMode: "exclusion",
+                x: "70vw",
+                margin: "auto 0 13.5rem 0"
+            }}
+            animate={{
+                x: "15vw"
+            }}
+            exit={{
+                x: "-80vw",
+            }}
+            transition={transition}
+            className={joinClasses(bodyStyles["desc-1-title"], "z1 no-pointer")}
+        >
+            <Box
+                as={"p"}
+                fontFamily={"Oswald"}
+                fontWeight={"500"}
+                fontSize={"100"}
+                color={"#fff"}
+                textAlign={"left"}
+                p={"0.8ch"}
+                pl={"2ch"}
+                mixBlendMode={"exclusion"}
+            >
+                START EXPLORING
+            </Box>
+        </motion.div>
+    );
+};
+
+const Screen1_Info = () => {
+    const [isExiting, setIsExiting] = useState(false);
+    const [isShowing, setIsShowing] = useState(false);
+    useEffect(() => () => {
+        setIsExiting(true);
+    }, []);
+    const transition = {
+        duration: isExiting ? 1.5 : 1.7,
+        ease: isExiting ? SpeedUp : Forceful,
+    };
+    return (
+        <motion.div
+            initial={{
+                flexGrow: 1,
+                margin: "auto 2vh 4vh auto",
+                maxHeight: "calc(100% - 4vh)",
+                width: "min(650px, 80vw)",
+                x: "40vw"
+            }}
+            animate={{ x: "0vw" }}
+            exit={{ x: "-100vw" }}
+            transition={transition}
+            className={joinClasses(bodyStyles["desc-1"], "overflow-hidden z1")}
+            key={"desc-1"}
+        >
+            <DescriptionToggleBtn onClick={setIsShowing} initial={isShowing}/>
+
+            <motion.div
+                initial={{
+                    color: "#000",
+                    width: "100%",
+                    padding: "1em 0.8em",
+                    fontFamily: "Oswald",
+                    fontWeight: "300",
+                    fontSize: "1.3em",
+                    backgroundColor: "#E8E8E8",
+                }}
+                layout={"position"}
+                className={"overflow-auto-y z0"}
+            >
+                Welcome to Talos-II, a dangerous planet rife with catastrophes and risks. The first pioneers toiled for years to establish a foothold. Settlements and nomadic cities sheltered by massive walls formed a new foundation for our civilization. But the vast wildlands and uninhabited territories stretching far beyond the colonies of the Habitable Band have yet to be surveyed. As such, most of this world remain untamed.
+                {
+                    isShowing &&
+                    <>
+                        <br/><br/>Expansion and exploration are unchanging themes that go hand-in-hand with progress.<br/>
+                        Originium engines rumble in the wildlands while automated construction machinery work around the clock to deploy new industry complex production lines. You will lead a professional team of Endfield Industries operators. Explore this world, conquer this land, recover lost technologies, and unearth secrets hidden within the abandoned ruins.<br/>
+                        <br/>Welcome to Talos-II and your new home at Endfield Industries. A new era of change has dawned upon this ancient world. Time to make your choice.<br/>
+                        Good luck.
+                    </>
+                }
+            </motion.div>
+        </motion.div>
+    );
+};
+
+
+interface ISlideshowProps {
+    imageURLs: string[];
+    interval: number;
 }
 
-const Background: FC<IBackgroundProps> = () => {
-    return (<motion.div
-        className={joinClasses(bodyStyles["preview-backgound"], "fh z0 overflow-hidden")}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.5, ease: Forceful }}
-    >
-        <Image
-            src={"/img/05_HD.jpg"}
-            alt={""}
-            quality={100}
-            priority
-            layout={"fill"}
-            objectFit={"cover"}
-            style={{
-                scale: 1
-            }}
-        />
-    </motion.div>);
+const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
+    return (
+        <AnimatePresence>
+            <motion.div
+                className={joinClasses(bodyStyles["preview-background"], "fh z0 overflow-hidden")}
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.5, ease: Forceful }}
+            >
+                <Image
+                    src={"/img/05_HD.jpg"}
+                    alt={""}
+                    quality={100}
+                    priority
+                    layout={"fill"}
+                    objectFit={"cover"}
+                    style={{
+                        scale: 1
+                    }}
+                />
+            </motion.div>
+        </AnimatePresence>
+    );
 };
 
 interface IIndex {
@@ -187,7 +327,7 @@ const LeftPanel: FC<IIndex> = ({ onIndexAnimStart= emptyFunc, onIndexAnimEnd= em
     };
     return (
         <motion.svg
-            className={joinClasses("fh z1", bodyStyles["index-panel"])}
+            className={joinClasses("fh z2", bodyStyles["index-panel"])}
             layout
             viewBox="0 29 520 880"
             fill="none"
@@ -257,7 +397,7 @@ const LeftPanel: FC<IIndex> = ({ onIndexAnimStart= emptyFunc, onIndexAnimEnd= em
                                 <motion.text
                                     initial={{ x: 400 }}
                                     animate={{ x: -500 }}
-                                    exit={{ x: -1400 }}
+                                    exit={{ x: -1800 }}
                                     {...indexTextConfig}
                                 >
                                     <tspan x={188}>PROTOCOL FIELD</tspan>
@@ -344,7 +484,7 @@ const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
             fillOpacity: 0.47,
         },
         2: {
-            d: "M4,0H800V907H250Z",
+            d: "M94,0H800V907H340Z",
             fillOpacity: 0.47,
         },
         3: {
@@ -362,7 +502,7 @@ const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
             fillOpacity: 0.5,
         },
         2: {
-            d: "M54,0H800V907H300Z",
+            d: "M144,0H800V907H390Z",
             fillOpacity: 0.5,
         },
         3: {
@@ -398,6 +538,12 @@ const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
         exit: { opacity: 0, x: -600 },
     };
 
+    const largeText2Props = {
+        fontSize: 250,
+        fontWeight: "bold",
+    };
+
+
     return (
         <motion.svg
             viewBox="0 0 800 907"
@@ -422,14 +568,50 @@ const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
                             <motion.text
                                 {...Object.assign(largeTextProps, largeText1UProps)}
                                 transition={transition}
+                                key={"index-1-text-1"}
                             >
                                 <tspan y={220} x={-120}>ENDFIELD</tspan>
                             </motion.text>
                             <motion.text
                                 {...Object.assign(largeTextProps, largeText1LProps)}
                                 transition={transition}
+                                key={"index-1-text-2"}
                             >
                                 <tspan y={480} x={120}>EXPLORATION</tspan>
+                            </motion.text>
+                        </>
+                    }
+                </AnimatePresence>
+                <AnimatePresence>
+                    {
+                        currentIndex === 2 && <>
+                            <motion.text
+                                {...Object.assign(largeTextProps, largeText2Props, largeText1UProps)}
+                                transition={transition}
+                                key={"index-2-text-1"}
+                            >
+                                <tspan y={220} x={-120}>PROTOCOL</tspan>
+                            </motion.text>
+                            <motion.text
+                                {...Object.assign(largeTextProps, largeText2Props, largeText1LProps)}
+                                transition={transition}
+                                key={"index-2-text-2"}
+                            >
+                                <tspan y={450} x={190}>FIELD</tspan>
+                            </motion.text>
+                            <motion.text
+                                {...Object.assign(largeTextProps, largeText2Props, largeText1UProps)}
+                                transition={transition}
+                                key={"index-2-text-3"}
+                            >
+                                <tspan y={680} x={120}>RECOVERY</tspan>
+                            </motion.text>
+                            <motion.text
+                                {...Object.assign(largeTextProps, largeText2Props, largeText1LProps)}
+                                transition={transition}
+                                key={"index-2-text-4"}
+                            >
+                                <tspan y={910} x={120}>DEPARTMENT</tspan>
                             </motion.text>
                         </>
                     }
