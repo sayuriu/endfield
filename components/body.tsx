@@ -31,7 +31,7 @@ export const Body = () => {
         <AnimatePresence exitBeforeEnter>
             <Background key={"backgroundPad"}/>
         </AnimatePresence>
-        <IndexPanel onIndexChange={setCurrentPage} onIndexAnimStart={(from, to) => changePage(to)}/>
+        <LeftPanel onIndexChange={setCurrentPage} onIndexAnimStart={(from, to) => changePage(to)}/>
         <RightPanel currentIndex={currentPage}/>
     </Box>);
 };
@@ -67,13 +67,7 @@ interface IIndex {
     onIndexAnimEnd?: (from: number, to: number) => void;
     onIndexChange?: (index: number) => void;
 }
-const IndexPanel: FC<IIndex> = (
-    {
-        onIndexAnimStart= emptyFunc,
-        onIndexAnimEnd= emptyFunc,
-        onIndexChange= emptyFunc,
-    }
-) => {
+const LeftPanel: FC<IIndex> = ({ onIndexAnimStart= emptyFunc, onIndexAnimEnd= emptyFunc, onIndexChange= emptyFunc }) => {
     const [init, setInit] = useState(true);
     const [indexSubU, setIndexSubU] = useState(0);
     const [indexMain, setIndexMain] = useState(1);
@@ -384,6 +378,26 @@ const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
         transition,
     };
 
+    const largeTextProps = {
+        fontFamily: "Oswald",
+        fontSize: 300,
+        fill: "#000",
+        opacity: .3,
+        fontWeight: "500",
+    };
+
+    const largeText1UProps = {
+        initial: { opacity: 0, x: 450 },
+        animate: { opacity: .3, x: 0 },
+        exit: { opacity: 0, x: -450 },
+    };
+
+    const largeText1LProps = {
+        initial: { opacity: 0, x: 600 },
+        animate: { opacity: .3, x: 0 },
+        exit: { opacity: 0, x: -600 },
+    };
+
     return (
         <motion.svg
             viewBox="0 0 800 907"
@@ -401,7 +415,33 @@ const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
                 variants={InnerPolygonVariants}
                 {...commonPolygonProps}
             />
+            <g clipPath={"url(#right-inner-polygon"}>
+                <AnimatePresence>
+                    {
+                        currentIndex === 1 && <>
+                            <motion.text
+                                {...Object.assign(largeTextProps, largeText1UProps)}
+                                transition={transition}
+                            >
+                                <tspan y={220} x={-120}>ENDFIELD</tspan>
+                            </motion.text>
+                            <motion.text
+                                {...Object.assign(largeTextProps, largeText1LProps)}
+                                transition={transition}
+                            >
+                                <tspan y={480} x={120}>EXPLORATION</tspan>
+                            </motion.text>
+                        </>
+                    }
+                </AnimatePresence>
+            </g>
             <defs>
+                <clipPath id={"right-inner-polygon"}>
+                    <motion.path
+                        variants={InnerPolygonVariants}
+                        {...Object.assign(commonPolygonProps, { fill: undefined, fillOpacity: 1 })}
+                    />
+                </clipPath>
                 <filter id="filter0_bd_186_4" x="0.290833" y="-3.13477" width="800" height="919" filterUnits="userSpaceOnUse" colorInterpolationFilters="sRGB">
                     <feFlood floodOpacity="0" result="BackgroundImageFix"/>
                     <feGaussianBlur in="BackgroundImage" stdDeviation="2"/>
