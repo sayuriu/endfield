@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useAtom } from "jotai";
-import { useEffect, useState } from 'react';
+import { FC, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 
 import { localGet, Nullable, waitAsync } from "@utils/common";
@@ -100,12 +100,12 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
             {logoVisible && currentLang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
             {logoVisible && currentLang === 'jp' && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
             {/*kr <Component "LogoLargeKR" @child>*/}
-            {!isLoading && <>
-                <Body key="body"/>
-                <Footer key="footer"/>
-                <Header key="header"/>
-            </>}
         </AnimatePresence>
+        {!isLoading && <>
+            <Body key="body"/>
+            <Footer key="footer"/>
+            <Header key="header"/>
+        </>}
     </div>;
 };
 

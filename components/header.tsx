@@ -167,7 +167,7 @@ const SettingsToggle: FC<ISettingsToggle> = ({ active, onClick }) => {
                 }}
                 className={"flex a-flex-center j-flex-center"}
                 transition={transition}
-                layout
+                layout={"position"}
             >
                 <SettingsIcon/>
                 <AnimatePresence>
@@ -178,7 +178,7 @@ const SettingsToggle: FC<ISettingsToggle> = ({ active, onClick }) => {
                             exit={{ opacity: 0, width: 0 }}
                             transition={transition}
                             style={{whiteSpace: "nowrap", overflow: "hidden"}}
-                            layout
+                            layout={"position"}
                         >
                             {locale("settings.label")}
                         </motion.p>
@@ -249,6 +249,7 @@ const SettingsItem: FC<{ children?: ReactNode } & OverridableStyle> = (
             initial="childHidden"
             animate="childVisible"
             exit="childHidden"
+            layout={"position"}
         >
             {children}
         </motion.div>

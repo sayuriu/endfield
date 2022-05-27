@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { Box } from "@chakra-ui/react";
+import { Box, Heading } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Language } from "@states/global";
 import { FC, ReactNode, useEffect, useState } from "react";
@@ -20,9 +20,7 @@ export const Body = () => {
         if (to === currentPage) return;
         setCurrentPage(to);
     };
-    useEffect(() => {
-        // console.log(currentLanguage);
-    }, [currentLanguage]);
+    useEffect(() => { }, [currentLanguage]);
     return (<Box
         h="calc(100vh - 176px)"
         w="100vw"
@@ -30,143 +28,51 @@ export const Body = () => {
         className={joinClasses(bodyStyles["content"], "rel grid")}
     >
         <Slideshow interval={5000} imageURLs={["/img/05_HD.jpg"]}/>
-        <LeftPanel onIndexChange={setCurrentPage} onIndexAnimStart={(from, to) => changePage(to)}/>
-        <RightPanel currentIndex={currentPage}/>
+        <DesktopPanel
+            LPanelOnIndexAnimStart={(from, to) => changePage(to)}
+            LPanelIndexChange={setCurrentPage}
+            RPanelCurrentIndex={currentPage}
+            InitialIndex={currentPage}
+        />
         <AnimatePresence>
             {currentPage === 1 && <>
-                <Screen1_Title/>
-                <Screen1_Info/>
+                <motion.div key={'omg the title'}>
+                    <Heading as="h1" size="2xl" className={bodyStyles["title"]}>
+                    </Heading>
+                </motion.div>
+                <motion.div key={'uhhhh'}>
+
+                </motion.div>
             </>}
         </AnimatePresence>
     </Box>);
 };
 
-const DescriptionToggleBtn: FC<{ onClick: (active: boolean) => void, initial: boolean }> = ({ onClick, initial }) => {
-    const [isOpen, setIsOpen] = useState(initial);
-    const HandleClick = () => {
-        setIsOpen(!isOpen);
-        onClick(isOpen);
-    };
-    return (
-        <motion.button
-            animate={{
-                backgroundColor: "#D9D9D9",
-                boxShadow: "#000 0px 0px 20px 0px",
-            }}
-            className={"fw z1"}
-            layout
-            onClick={HandleClick}
-        >
-            <Box
-                as={"p"}
-                w={"100%"}
-                fontFamily={"Oswald"}
-                fontWeight={"bold"}
-                color={"#000"}
-                textAlign={"left"}
-                p={"0.8ch"}
-                pl={"2ch"}
-            >
-                {isOpen ? "MORE" : "LESS"}
-            </Box>
-        </motion.button>
-    );
-};
+interface IDesktopPanelProps {
+    LPanelIndexChange: (index: number) => void;
+    LPanelOnIndexAnimStart: (from: number, to: number) => void;
+    RPanelCurrentIndex: number;
+    InitialIndex?: number;
+}
+const DesktopPanel: FC<IDesktopPanelProps> = ({ LPanelOnIndexAnimStart, LPanelIndexChange, RPanelCurrentIndex, InitialIndex }) => {
+    const [isPortrait, setIsPortrait] = useState(false);
+    useEffect(() => {
+        const listener = () => {
+            const portrait = window.innerHeight > window.innerWidth;
+            if (isPortrait !== portrait)
+                setIsPortrait(_current => portrait !== _current ? portrait : _current);
+        };
+        window.addEventListener('resize', listener);
 
-const Screen1_Title = () => {
-    const [isExiting, setIsExiting] = useState(false);
-    useEffect(() => () => {
-        setIsExiting(true);
-    }, []);
-    const transition = {
-        duration: isExiting ? 1.55 : 1.7,
-        ease: isExiting ? SpeedUp : Forceful,
-    };
+        return () => window.removeEventListener('resize', listener);
+    }, [isPortrait]);
     return (
-        <motion.div
-            initial={{
-                mixBlendMode: "exclusion",
-                x: "70vw",
-                margin: "auto 0 13.5rem 0"
-            }}
-            animate={{
-                x: "15vw"
-            }}
-            exit={{
-                x: "-80vw",
-            }}
-            transition={transition}
-            className={joinClasses(bodyStyles["desc-1-title"], "z1 no-pointer")}
-        >
-            <Box
-                as={"p"}
-                fontFamily={"Oswald"}
-                fontWeight={"500"}
-                fontSize={"100"}
-                color={"#fff"}
-                textAlign={"left"}
-                p={"0.8ch"}
-                pl={"2ch"}
-                mixBlendMode={"exclusion"}
-            >
-                START EXPLORING
-            </Box>
-        </motion.div>
-    );
-};
-
-const Screen1_Info = () => {
-    const [isExiting, setIsExiting] = useState(false);
-    const [isShowing, setIsShowing] = useState(false);
-    useEffect(() => () => {
-        setIsExiting(true);
-    }, []);
-    const transition = {
-        duration: isExiting ? 1.5 : 1.7,
-        ease: isExiting ? SpeedUp : Forceful,
-    };
-    return (
-        <motion.div
-            initial={{
-                flexGrow: 1,
-                margin: "auto 2vh 4vh auto",
-                maxHeight: "calc(100% - 4vh)",
-                width: "min(650px, 80vw)",
-                x: "40vw"
-            }}
-            animate={{ x: "0vw" }}
-            exit={{ x: "-100vw" }}
-            transition={transition}
-            className={joinClasses(bodyStyles["desc-1"], "overflow-hidden z1")}
-            key={"desc-1"}
-        >
-            <DescriptionToggleBtn onClick={setIsShowing} initial={isShowing}/>
-
-            <motion.div
-                initial={{
-                    color: "#000",
-                    width: "100%",
-                    padding: "1em 0.8em",
-                    fontFamily: "Oswald",
-                    fontWeight: "300",
-                    fontSize: "1.3em",
-                    backgroundColor: "#E8E8E8",
-                }}
-                layout={"position"}
-                className={"overflow-auto-y z0"}
-            >
-                Welcome to Talos-II, a dangerous planet rife with catastrophes and risks. The first pioneers toiled for years to establish a foothold. Settlements and nomadic cities sheltered by massive walls formed a new foundation for our civilization. But the vast wildlands and uninhabited territories stretching far beyond the colonies of the Habitable Band have yet to be surveyed. As such, most of this world remain untamed.
-                {
-                    isShowing &&
-                    <>
-                        <br/><br/>Expansion and exploration are unchanging themes that go hand-in-hand with progress.<br/>
-                        Originium engines rumble in the wildlands while automated construction machinery work around the clock to deploy new industry complex production lines. You will lead a professional team of Endfield Industries operators. Explore this world, conquer this land, recover lost technologies, and unearth secrets hidden within the abandoned ruins.<br/>
-                        <br/>Welcome to Talos-II and your new home at Endfield Industries. A new era of change has dawned upon this ancient world. Time to make your choice.<br/>
-                        Good luck.
-                    </>
-                }
-            </motion.div>
-        </motion.div>
+        <AnimatePresence>
+            {!isPortrait && <>
+                <LeftPanel onIndexChange={LPanelIndexChange} onIndexAnimStart={LPanelOnIndexAnimStart} initIndex={InitialIndex}/>
+                <RightPanel currentIndex={RPanelCurrentIndex}/>
+            </>}
+        </AnimatePresence>
     );
 };
 
@@ -203,15 +109,21 @@ const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
 };
 
 interface IIndex {
+    initIndex?: number;
     onIndexAnimStart?: (from: number, to: number) => void;
     onIndexAnimEnd?: (from: number, to: number) => void;
     onIndexChange?: (index: number) => void;
 }
-const LeftPanel: FC<IIndex> = ({ onIndexAnimStart= emptyFunc, onIndexAnimEnd= emptyFunc, onIndexChange= emptyFunc }) => {
+const LeftPanel: FC<IIndex> = ({
+        onIndexAnimStart= emptyFunc,
+        onIndexAnimEnd= emptyFunc,
+        onIndexChange= emptyFunc,
+        initIndex = 1
+}) => {
     const [init, setInit] = useState(true);
-    const [indexSubU, setIndexSubU] = useState(0);
-    const [indexMain, setIndexMain] = useState(1);
-    const [indexSubL, setIndexSubL] = useState(2);
+    const [indexSubU, setIndexSubU] = useState(initIndex - 1);
+    const [indexMain, setIndexMain] = useState(initIndex);
+    const [indexSubL, setIndexSubL] = useState(initIndex + 1);
     const [indexPolygon, setIndexPolygon] = useState(0);
     const [isAnimating, setIsAnimating] = useState(false);
 
@@ -325,6 +237,7 @@ const LeftPanel: FC<IIndex> = ({ onIndexAnimStart= emptyFunc, onIndexAnimEnd= em
         transition,
         initial: "0",
     };
+    // TODO: main index's text is displaced after this component rerenders for the 2nd time
     return (
         <motion.svg
             className={joinClasses("fh z2", bodyStyles["index-panel"])}
