@@ -79,12 +79,12 @@ $logo-anim-delay: 0s;
         .g-chr4 {
             transform: translateX(-0.2px);
             clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%);
-            animation: expand_DU 1s endfieldCNAnimDelay(.6s) forwards;
+            animation: expand_DU 0.7s endfieldCNAnimDelay(.6s) forwards;
             .arknights, .endfield {
                 transform: translateY(10px);
                 animation:
                     slide_DU
-                        0.8s endfieldCNAnimDelay(.56s) $forceful forwards;
+                        0.7s endfieldCNAnimDelay(.4s) $forceful forwards;
             }
             .arknights { --order: 1 }
             .endfield { --order: 2 }

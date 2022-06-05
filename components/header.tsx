@@ -12,6 +12,7 @@ import { Checkbox } from "@components/checkbox";
 import { AvailableLanguages, Language } from "@states/global";
 import { localGet, localSet, Nullable, OverridableStyle, useLocale } from "@utils/common";
 import { LogoSmall_JP } from "@components/logo/JP/JP-small";
+import { MotionBox } from "./chakra-motion";
 
 function resolveConfig(lang: Nullable<string>)
 {
@@ -159,32 +160,33 @@ const SettingsToggle: FC<ISettingsToggle> = ({ active, onClick }) => {
             onMouseLeave={() => setIsHover(false)}
             className={"rel exclusion"}
         >
-            <motion.div
-                animate={{
+            <MotionBox
+                initial={{
                     padding: "0.5rem 1.5rem 0.5rem 0.5rem",
-                    gap: "2px",
-                    color: "#fff",
                 }}
+                animate={{
+                    paddingRight: isSmall ? "0.2rem" : "1.5rem",
+                }}
+                gap={"2px"}
+                color={"#fff"}
                 className={"flex a-flex-center j-flex-center"}
                 transition={transition}
                 layout={"position"}
             >
                 <SettingsIcon/>
                 <AnimatePresence>
-                    {!isSmall &&
-                        <motion.p
-                            initial={{ opacity: 0, width: 0 }}
-                            animate={{ opacity: 1, width: "100%" }}
-                            exit={{ opacity: 0, width: 0 }}
-                            transition={transition}
-                            style={{whiteSpace: "nowrap", overflow: "hidden"}}
-                            layout={"position"}
-                        >
-                            {locale("settings.label")}
-                        </motion.p>
-                    }
+                    <motion.p
+                        initial={{ opacity: 0, width: 0 }}
+                        animate={{ opacity: 1, width: isSmall ? 0 : "100%" }}
+                        exit={{ opacity: 0, width: 0 }}
+                        transition={transition}
+                        style={{whiteSpace: "nowrap", overflow: "hidden"}}
+                        layout={"position"}
+                    >
+                        {locale("settings.label")}
+                    </motion.p>
                 </AnimatePresence>
-            </motion.div>
+            </MotionBox>
             <motion.div
                 className={"abs fh t0 r0"}
                 animate={{

@@ -1,8 +1,8 @@
-import { FC, useEffect } from "react";
+import { FC, useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
 import { AnimFunctions } from "@utils/anims";
-import { i18n, joinClasses, useLocale } from "@utils/common";
+import { joinClasses, useLocale } from "@utils/common";
 import { HypergryphLogo } from "@components/logo/Hypergryph/Hypergryph";
 import { MountainContourLogo } from "@components/logo/MountainContour/MountainContour";
 import { Anchor } from "@components/anchor";
@@ -69,9 +69,19 @@ const FooterText: FC<{ lang: string }> = ({ lang }) => {
         await control.start({ opacity: 0 });
         await control.start({ opacity: 1 });
     };
+    const [smallHorizontal, setSmallHorizontal] = useState(false);
+    const listener = () => {
+        const portrait = window.innerWidth < 814;
+        if (smallHorizontal !== portrait)
+            setSmallHorizontal(_current => portrait !== _current ? portrait : _current);
+    };
     useEffect(() => {
         void sequence();
+        listener();
+        window.addEventListener('resize', listener);
+
         return () => {
+            window.removeEventListener('resize', listener);
             control.start({ opacity: 0 }).then(control.stop);
         };
     } , [locale]);
@@ -101,7 +111,7 @@ const FooterText: FC<{ lang: string }> = ({ lang }) => {
                 maxWidth={"70%"}
                 isTruncated
             >
-                {locale("footer.fanmade")}
+                {locale(smallHorizontal ? "footer.fanmade::short" : "footer.fanmade")}
                 <br/>
                 <Anchor to="https://endfield.hypergryph.global">{locale("footer.to-offcl")}</Anchor>&thinsp;|&thinsp;
                 <Anchor to="https://endfield.hypergryph.com">{locale("footer.cn-ver")}</Anchor>

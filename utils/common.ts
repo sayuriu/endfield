@@ -23,6 +23,7 @@ export const localRemove = (key: string): void => localStorage.removeItem(key);
 export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'width' : 'height';
 export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
+export const wait = (ms: number) => { const timeout = Date.now() + ms; while (Date.now() < timeout) {} };
 export const waitAsync = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 export const emptyFunc = () => {};
 
