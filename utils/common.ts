@@ -16,7 +16,7 @@ export interface OverridableStyle {
 export interface Logo {
     noLogoText?: Nullable<boolean>;
 }
-export const nullTryReturn = <T, A>(action: (...args: A) => T, ...args: A): Nullable<T> => {
+export const nullTryReturn = <T, A>(action: (...args: A[]) => T, ...args: A[]): Nullable<T> => {
     try {
         return action(...args);
     } catch(_) {
