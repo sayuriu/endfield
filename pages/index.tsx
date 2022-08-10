@@ -4,7 +4,7 @@ import { useAtom } from "jotai";
 import { FC, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 
-import { localGet, Nullable, waitAsync } from "@utils/common";
+import { localGet, localSet, Nullable, waitAsync } from "@utils/common";
 // import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
 import {AvailableLanguages, Language} from "@states/global";
 import { Footer } from "@components/footer";
@@ -61,13 +61,13 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
             document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());
         else
         {
-            let time = localStorage.getItem('endfield-time');
+            let time = localGet('endfield-time');
             if (!time)
-                localStorage.setItem('endfield-time', new Date().toISOString() + "@first");
+                localSet('endfield-time', new Date().toISOString() + "@first");
             else
             {
                 if (time.includes('@first'))
-                    localStorage.setItem('endfield-time', time.replace('@first', ''));
+                    localSet('endfield-time', time.replace('@first', ''));
                 else
                 {
                     const timeThen = new Date().getTime();
@@ -75,7 +75,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                     if (timeDiff < 1000 * 60 * 60 * 24)
                         animateLogo = false;
                     else
-                        localStorage.setItem('endfield-time', new Date(timeThen + 1000 * 60 * 60 * 24).toISOString());
+                        localSet('endfield-time', new Date(timeThen + 1000 * 60 * 60 * 24).toISOString());
                 }
             }
         }
