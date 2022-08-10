@@ -23,9 +23,9 @@ export const nullTryReturn = <T, A>(action: (...args: A[]) => T, ...args: A[]): 
         return null;
     }
 } 
-export const localGet = (key: string): Nullable<string> => nullTryReturn(localStorage.getItem, key);
-export const localSet = (key: string, value: string): void => void nullTryReturn(localStorage.setItem, key, value);
-export const localRemove = (key: string): void => void nullTryReturn(localStorage.removeItem, key);
+export const localGet = (key: string): Nullable<string> => nullTryReturn((k) => localStorage.getItem(k), key);
+export const localSet = (key: string, value: string): void => void nullTryReturn((k, v) => localStorage.setItem(k, v), key, value);
+export const localRemove = (key: string): void => void nullTryReturn((k) => localStorage.removeItem(k), key);
 
 export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'width' : 'height';
 export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
