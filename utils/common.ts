@@ -16,10 +16,17 @@ export interface OverridableStyle {
 export interface Logo {
     noLogoText?: Nullable<boolean>;
 }
+export const nullTryReturn = <T, A>(action: (...args: A[]) => T, ...args: A[]): Nullable<T> => {
+    try {
+        return action(...args);
+    } catch(_) {
+        return null;
+    }
+} 
+export const localGet = (key: string): Nullable<string> => nullTryReturn(localStorage.getItem, key);
+export const localSet = (key: string, value: string): void => void nullTryReturn(localStorage.setItem, key, value);
+export const localRemove = (key: string): void => void nullTryReturn(localStorage.removeItem, key);
 
-export const localGet = (key: string): Nullable<string> => localStorage.getItem(key);
-export const localSet = (key: string, value: string): void => localStorage.setItem(key, value);
-export const localRemove = (key: string): void => localStorage.removeItem(key);
 export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'width' : 'height';
 export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
