@@ -58,7 +58,7 @@ export function i18n(key: string, lang= 'en'): string {
     {
         if (typeof data[subkey] === 'string' && level === keys.length)
             return data[subkey];
-        if (!Object.hasOwn(data, subkey))
+        if (!(subkey in data))
             break;
         data = data[subkey];
         level++;
