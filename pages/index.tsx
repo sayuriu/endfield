@@ -111,6 +111,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                     mimeType: 'image/jpeg',
                     onProgressUpdate: (v) => {
                         const percentage = Math.floor(v * 100);
+                        console.log(percentage);
                         setProgressPercentage(percentage);
                         setProgressString(() => percentage === 100 ? 'Ready.' : `${percentage}% loading ${buildProgressTitle(loader.requests)}`);
                         if (v === 1) waitAsync(500).then(() => setProgressPercentage(() => 101));
@@ -134,7 +135,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
             await waitAsync(500).then(() => {
                 setLogoVisible(() => true);
                 setFinishedLoading(prev => ({ ...prev, ...(prev.label === 'xhr' ? {} : { label: "" }) }));
-                setLogoBool(() => () => progressPercentage < 100);
+                setLogoBool(() => () => finishedLoading.label === 'xhr');
             });
             await waitAsync(animateLogo ? 6500 : 1200)
                 .then(() => setLogoVisible(() => false));
