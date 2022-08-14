@@ -1,4 +1,4 @@
-import { Nullable } from "@utils/common";
+import { ExcludeKey, ExcludeProps, Nullable } from "@utils/common";
 
 type ResponseDataT = 'blob' | 'arraybuffer' | 'json' | 'text';
 
@@ -7,6 +7,7 @@ export interface RequestData {
     success: boolean;
     progress: number;
     resolved: Nullable<unknown>;
+    metadata: ExcludeProps<RequestOptions, Function>
 }
 
 interface RequestOptions {
@@ -20,17 +21,29 @@ export class AssetLoader {
     totalProgress = 0;
     pollingTimeout?: boolean;
     resolve?: (value: RequestData[]) => void;
+    onProgressUpdate?: (progress: number) => void;
 
-    constructor(readonly urls: string[], private options: RequestOptions = {}) {
-        this.requests = urls.map(url => ({ url, success: false, progress: 0, resolved: null }));
+    constructor(requests: { url: string, overrideOptions?: ExcludeKey<RequestOptions, 'onProgressUpdate'> }[], options: RequestOptions = {}) {
+        this.onProgressUpdate = options.onProgressUpdate;
+        delete options.onProgressUpdate;
+        this.requests = requests.map(({ url, overrideOptions }) => ({
+            url,
+            success: false,
+            progress: 0,
+            resolved: null,
+            metadata: {
+                ...options,
+                ...(overrideOptions ?? {})
+            }
+        }));
         for (const request of this.requests) {
             this.load(request);
         }
     }
     load(request: RequestData) {
         const xhr = new XMLHttpRequest();
-        if (this.options.mimeType) xhr.overrideMimeType(this.options.mimeType);
-        if (this.options.responseType) xhr.responseType = this.options.responseType;
+        if (request.metadata.mimeType) xhr.overrideMimeType(request.metadata.mimeType);
+        if (request.metadata.responseType) xhr.responseType = request.metadata.responseType;
         xhr.open("GET", request.url, true);
         xhr.onprogress = (e) => {
             if (e.lengthComputable) {
@@ -62,7 +75,7 @@ export class AssetLoader {
             return;
         }
         this.totalProgress = this.requests.reduce((acc, { progress }) => acc + progress, 0) / this.requests.length;
-        this.options.onProgressUpdate?.(this.totalProgress);
+        this.onProgressUpdate?.(this.totalProgress);
 
         setTimeout(() => {
             delete this.pollingTimeout;

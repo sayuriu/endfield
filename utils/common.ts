@@ -7,6 +7,14 @@ import { AvailableLanguages } from "@states/global";
 export type Nullable<T> = T | null;
 export type NullablePromise<T> = Promise<Nullable<T>>;
 
+export type ExcludeProps<T, N> = {
+    [P in keyof T]: T[P] extends N ? never : T[P];
+}
+
+export type ExcludeKey<T, K> = {
+    [P in Exclude<keyof T, K>]: T[P];
+}
+
 export interface HasAnimation {
     dontAnimateChild?: Nullable<boolean>;
 }
@@ -22,7 +30,7 @@ export const nullTryReturn = <T, A>(action: (...args: A[]) => T, ...args: A[]): 
     } catch(_) {
         return null;
     }
-} 
+};
 export const localGet = (key: string): Nullable<string> => nullTryReturn((k) => localStorage.getItem(k), key);
 export const localSet = (key: string, value: string): void => void nullTryReturn((k, v) => localStorage.setItem(k, v), key, value);
 export const localRemove = (key: string): void => void nullTryReturn((k) => localStorage.removeItem(k), key);

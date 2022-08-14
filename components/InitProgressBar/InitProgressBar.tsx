@@ -1,16 +1,9 @@
 import { FC, useEffect, useRef } from "react";
 import { motion, useSpring } from "framer-motion";
-import { SpringOptions } from "popmotion";
+import Three from "three";
 import styles from "./InitLoader.module.scss";
 
 export const InitProgressBar: FC<{ progress: number, title?: JSX.Element }> = ({ progress, title }) => {
-
-    // const percentage = useAnimatedText(progress, {
-    //     mass: 5,
-    //     stiffness: 1000,
-    //     damping: 100,
-    //     restDelta: 0.0001
-    // });
     return <motion.div
         className="fw abs b0 l0"
         exit={{ opacity: 0 }}
@@ -23,8 +16,8 @@ export const InitProgressBar: FC<{ progress: number, title?: JSX.Element }> = ({
     >
         {title}
         <motion.div
-            className="fw"
-            initial={{ width: 0, height: 8, backgroundColor: '#fff' }}
+            className="fw rel"
+            initial={{ width: 0, height: '20px', backgroundColor: '#fff' }}
             animate={{ width: (progress > 100 ? 100 : progress) + '%' }}
             transition={{
                 duration: .3,
@@ -36,17 +29,16 @@ export const InitProgressBar: FC<{ progress: number, title?: JSX.Element }> = ({
     </motion.div>;
 };
 
-function useAnimatedText(target: number, transition: SpringOptions)
-{
-    const ref = useRef<any>(null);
-    const value = useSpring(0, transition);
-    useEffect(() => {
-        ref.current.innerText = target.toFixed(2);
+const prepareCanvas = (canvas: HTMLCanvasElement) => {
+};
 
-        return value.onChange((v) => {
-            ref.current.innerText = v.toFixed(2);
-        });
+const ProgressBarBG = () => {
+    const canvas = useRef<HTMLCanvasElement>(null);
+    useEffect(() => {
+        if (canvas.current)
+            prepareCanvas(canvas.current);
     });
-    useEffect(() => value.set(target), [target]);
-    return ref;
-}
+    return <motion.canvas ref={canvas}>
+
+    </motion.canvas>;
+};

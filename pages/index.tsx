@@ -1,7 +1,7 @@
 import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useAtom } from "jotai";
-import { FC, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
 import { Box } from "@chakra-ui/react";
 
@@ -51,12 +51,11 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
     const [progressPercentage , setProgressPercentage] = useState(0);
     const [progressString, setProgressString] = useState("0% loading");
 
-    const [finishedLoading, setFinishedLoading] = useState({ intro: false, label: 'a' });
+    const [finishedLoading, setFinishedLoading] = useState(false);
     const [logoVisible, setLogoVisible] = useState(false);
     const [introVisible, setIntroVisible] = useState(false);
+    const [introFinished, setIntroFinished] = useState(false);
     const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
-
-    const [logoBool, setLogoBool] = useState(() => () => false);
 
     const [currentLang, setCurrentLang] = useAtom(Language);
     const [, setImageData] = useAtom(ImageData);
@@ -64,10 +63,6 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
     const router = useRouter();
     if (!fullIntro && 'fullIntro' in router.query)
         fullIntro = router.query.fullIntro?.toString() ?? null;
-
-    const imageDeps = new Array(8)
-        .fill(0)
-        .map((_, i) => `img/0${i + 1}_HD.jpg`);
 
     useEffect(() => {
         if (currentLang !== lang) setCurrentLang(lang);
@@ -102,25 +97,24 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                 }
             }
         }
+
         setDontAnimate(animateLogo ? null : true);
         (async () => {
             const loader = new AssetLoader(
-                imageDeps,
+                new Array(8)
+                    .fill(0)
+                    .map((_, i) => ({ url: `img/0${i + 1}_HD.jpg`, overrideOption: { mimeType: 'image/jpeg' } })),
                 {
-                    responseType: 'blob',
-                    mimeType: 'image/jpeg',
+                    responseType: 'arraybuffer',
                     onProgressUpdate: (v) => {
                         const percentage = Math.floor(v * 100);
-                        console.log(percentage);
                         setProgressPercentage(percentage);
                         setProgressString(() => percentage === 100 ? 'Ready.' : `${percentage}% loading ${buildProgressTitle(loader.requests)}`);
-                        if (v === 1) waitAsync(500).then(() => setProgressPercentage(() => 101));
                     }
                 }
             );
             loader.await().then(resolved => {
                 setProgressPercentage(100);
-                setFinishedLoading(prev => ({ ...prev, label: 'xhr' }));
                 const imageData = new Map<string, string>(
                     resolved.map(({ url, resolved: data }) => [
                         url,
@@ -129,18 +123,18 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                             : 'null'
                     ]));
                 setImageData(imageData);
+                waitAsync(500).then(() => setProgressPercentage(() => 101));
             });
             await waitAsync(500).then(() =>  setIntroVisible(() => true));
             await waitAsync(3000).then(() => setIntroVisible(() => false));
             await waitAsync(500).then(() => {
                 setLogoVisible(() => true);
-                setFinishedLoading(prev => ({ ...prev, ...(prev.label === 'xhr' ? {} : { label: "" }) }));
-                setLogoBool(() => () => finishedLoading.label === 'xhr');
+                setIntroFinished(() => true);
             });
             await waitAsync(animateLogo ? 6500 : 1200)
                 .then(() => setLogoVisible(() => false));
             await waitAsync(500)
-                .then(() => setFinishedLoading(prev => ({ ...prev, intro: true })));
+                .then(() => setFinishedLoading(() => true));
         })();
     }, []);
 
@@ -148,18 +142,36 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
         <AnimatePresence>
             {
                 (progressPercentage !== 101) &&
-                <InitProgressBar
-                    progress={progressPercentage}
-                    title={<Box>{progressString}</Box>}
-                />
+                <motion.div
+                    className="fw abs b0 l0"
+                    exit={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{
+                        duration: .5,
+                        easings: [0.88,0, 0.22, 0],
+                        delay: 0.2,
+                    }}
+                >
+                    <motion.div
+                        className="fw rel"
+                        initial={{ width: 0, height: '20px', backgroundColor: '#fff' }}
+                        animate={{ width: (progressPercentage > 100 ? 100 : progressPercentage) + '%' }}
+                        transition={{
+                            duration: .3,
+                            easings: [0.88,-0.07, 0.22, 1.01],
+                        }}
+                    >
+
+                    </motion.div>
+                </motion.div>
             }
             {introVisible && <IntroLogo key="intro-logo"/>}
-            { currentLang === 'en' && (logoVisible || logoBool()) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
-            { currentLang === 'cn' && (logoVisible || logoBool()) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
-            { currentLang === 'jp' && (logoVisible || logoBool()) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
+            { currentLang === 'en' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            { currentLang === 'cn' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
+            { currentLang === 'jp' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
             {/*kr <Component "LogoLargeKR" @child>*/}
         </AnimatePresence>
-        {finishedLoading.intro && progressPercentage === 101 && <>
+        {finishedLoading && progressPercentage === 101 && <>
             <Body key="body"/>
             <Footer key="footer"/>
             <Header key="header"/>

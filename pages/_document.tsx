@@ -1,20 +1,15 @@
 import { Head, Html, Main, NextScript } from "next/document";
 
+const PreloadFont = ({ name }: { name: string }) => <link href={`/fonts/${name}.ttf`} rel={"preload"} as={"font"} crossOrigin={""}></link>;
+
 export default function Document() {
     return (
         <Html>
             <Head>
-                <link
-                    rel={"prefetch"}
-                    href={"/fonts/JetBrainsMono-Regular.ttf"}
-                    as={"font"}
-                    crossOrigin={""}
-                /><link
-                    rel={"prefetch"}
-                    href={"/fonts/JetBrainsMono-Italic.ttf"}
-                    as={"font"}
-                    crossOrigin={""}
-                />
+                <PreloadFont name={"JetBrainsMono-Regular"}/>
+                <PreloadFont name={"JetBrainsMono-Italic"}/>
+                <PreloadFont name={"Oswald-Regular"}/>
+                <PreloadFont name={"Oswald-Bold"}/>
             </Head>
             <body>
                 <Main/>
