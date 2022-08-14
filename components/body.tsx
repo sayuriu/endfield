@@ -1,7 +1,7 @@
 import Image from 'next/image';
 import { Box, Heading } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { Language } from "@states/global";
+import { Language, ImageData } from "@states/global";
 import { FC, useEffect, useState } from "react";
 import { AnimatePresence, motion, useAnimation } from "framer-motion";
 
@@ -236,6 +236,7 @@ interface ISlideshowProps {
 }
 
 const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
+    const [imageData] = useAtom(ImageData);
     return (
         <AnimatePresence>
             <motion.div
@@ -246,7 +247,7 @@ const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
                 transition={{ duration: 0.5, ease: Forceful }}
             >
                 <Image
-                    src={"/img/05_HD.jpg"}
+                    src={imageData.get('img/05_HD.jpg')!}
                     alt={""}
                     quality={100}
                     priority

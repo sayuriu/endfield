@@ -3,10 +3,12 @@ import { useRouter } from 'next/router';
 import { useAtom } from "jotai";
 import { FC, useEffect, useState } from 'react';
 import { AnimatePresence, motion } from "framer-motion";
+import { Box } from "@chakra-ui/react";
 
+import { AvailableLanguages, ImageData, Language } from "@states/global";
+import { AssetLoader, RequestData } from "@utils/loader";
 import { localGet, localSet, Nullable, waitAsync } from "@utils/common";
-// import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
-import {AvailableLanguages, Language} from "@states/global";
+import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
@@ -33,18 +35,39 @@ function getIntroAnimSpeed(lang: string)
     }
 }
 
+const buildProgressTitle = (requestData: RequestData[]) => {
+    let success = 0, failed = 0;
+    for (const request of requestData) {
+        if (request.progress !== 1) continue;
+        request.success ? success++ : failed++;
+    }
+    let out = `${success + failed}/${requestData.length}`;
+    if (success > 0) out += ` (${success} success)`;
+    if (failed > 0) out += ` (${failed} failed)`;
+    return out;
+};
+
 const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
-    // const [progressPercentage , setProgressPercentage] = useState(0);
-    const [isLoading, setIsLoading] = useState(true);
+    const [progressPercentage , setProgressPercentage] = useState(0);
+    const [progressString, setProgressString] = useState("0% loading");
+
+    const [finishedLoading, setFinishedLoading] = useState({ intro: false, label: 'a' });
     const [logoVisible, setLogoVisible] = useState(false);
     const [introVisible, setIntroVisible] = useState(false);
     const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
 
+    const [logoBool, setLogoBool] = useState(() => () => false);
+
     const [currentLang, setCurrentLang] = useAtom(Language);
+    const [, setImageData] = useAtom(ImageData);
 
     const router = useRouter();
     if (!fullIntro && 'fullIntro' in router.query)
         fullIntro = router.query.fullIntro?.toString() ?? null;
+
+    const imageDeps = new Array(8)
+        .fill(0)
+        .map((_, i) => `img/0${i + 1}_HD.jpg`);
 
     useEffect(() => {
         if (currentLang !== lang) setCurrentLang(lang);
@@ -79,29 +102,63 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                 }
             }
         }
-
         setDontAnimate(animateLogo ? null : true);
-        waitAsync(500).then(() => setIntroVisible(true));
-        waitAsync(3500).then(() => setIntroVisible(false));
-        waitAsync(4000).then(() => setLogoVisible(true));
-        waitAsync(animateLogo ? 9500 : 4200).then(async () => {
-            // setProgressPercentage(100);
-            await waitAsync(1000);
-            setLogoVisible(false);
-        });
-        waitAsync(animateLogo ? 10800 : 5500).then(() => setIsLoading(false));
+        (async () => {
+            const loader = new AssetLoader(
+                imageDeps,
+                {
+                    responseType: 'blob',
+                    mimeType: 'image/jpeg',
+                    onProgressUpdate: (v) => {
+                        const percentage = Math.floor(v * 100);
+                        setProgressPercentage(percentage);
+                        setProgressString(() => percentage === 100 ? 'Ready.' : `${percentage}% loading ${buildProgressTitle(loader.requests)}`);
+                        if (v === 1) waitAsync(500).then(() => setProgressPercentage(() => 101));
+                    }
+                }
+            );
+            loader.await().then(resolved => {
+                setProgressPercentage(100);
+                setFinishedLoading(prev => ({ ...prev, label: 'xhr' }));
+                const imageData = new Map<string, string>(
+                    resolved.map(({ url, resolved: data }) => [
+                        url,
+                        !!data ?
+                            URL.createObjectURL(new Blob([data as Blob]))
+                            : 'null'
+                    ]));
+                setImageData(imageData);
+            });
+            await waitAsync(500).then(() =>  setIntroVisible(() => true));
+            await waitAsync(3000).then(() => setIntroVisible(() => false));
+            await waitAsync(500).then(() => {
+                setLogoVisible(() => true);
+                setFinishedLoading(prev => ({ ...prev, ...(prev.label === 'xhr' ? {} : { label: "" }) }));
+                setLogoBool(() => () => progressPercentage < 100);
+            });
+            await waitAsync(animateLogo ? 6500 : 1200)
+                .then(() => setLogoVisible(() => false));
+            await waitAsync(500)
+                .then(() => setFinishedLoading(prev => ({ ...prev, intro: true })));
+        })();
     }, []);
 
     return <div className="rel fw fh flex j-flex-center a-flex-center">
         <AnimatePresence>
-            {/*{isLoading && <InitProgressBar progress={progressPercentage}/>}*/}
+            {
+                (progressPercentage !== 101) &&
+                <InitProgressBar
+                    progress={progressPercentage}
+                    title={<Box>{progressString}</Box>}
+                />
+            }
             {introVisible && <IntroLogo key="intro-logo"/>}
-            {logoVisible && currentLang === 'en' && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
-            {logoVisible && currentLang === 'cn' && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
-            {logoVisible && currentLang === 'jp' && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
+            { currentLang === 'en' && (logoVisible || logoBool()) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            { currentLang === 'cn' && (logoVisible || logoBool()) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
+            { currentLang === 'jp' && (logoVisible || logoBool()) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
             {/*kr <Component "LogoLargeKR" @child>*/}
         </AnimatePresence>
-        {!isLoading && <>
+        {finishedLoading.intro && progressPercentage === 101 && <>
             <Body key="body"/>
             <Footer key="footer"/>
             <Header key="header"/>

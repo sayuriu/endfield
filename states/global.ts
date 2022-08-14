@@ -12,3 +12,11 @@ export const Language = atom<string, string, void>(
     },
 );
 export const AvailableLanguages = ['en', 'cn', 'jp'];
+
+const ImageDataAtom = atom<Map<string, string>>(new Map());
+export const ImageData = atom<Map<string, string>, Map<string, string>, void>(
+    (get) => get(ImageDataAtom),
+    (get, set, newData) => {
+        set(ImageDataAtom, newData);
+    }
+);
