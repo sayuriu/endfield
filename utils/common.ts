@@ -38,12 +38,6 @@ export const localRemove = (key: string): void => void nullTryReturn((k) => loca
 export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'width' : 'height';
 export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
 
-export const findNextMultiple = (mul: number, target: number, isGreaterThanTarget = true) => {
-    let next = 0;
-    while (next + mul < target) {}
-    return next + (isGreaterThanTarget ? mul : 0);
-}
-
 export const wait = (ms: number) => { const timeout = Date.now() + ms; while (Date.now() < timeout) {} };
 export const waitAsync = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 export const emptyFunc = () => {};
