@@ -5,6 +5,7 @@ import Forceful = AnimFunctions.Forceful;
 import { OverridableStyle } from "@utils/common";
 
 interface ICheckbox {
+    disabled?: boolean;
     checked: boolean;
     onChange?: (checked: boolean) => void;
     fg?: string;

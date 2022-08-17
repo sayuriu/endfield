@@ -24,6 +24,9 @@ export interface OverridableStyle {
 export interface Logo {
     noLogoText?: Nullable<boolean>;
 }
+
+export const findNearestMultiple = (multiplier: number, target: number, isGreater = true) =>
+    multiplier * Math[isGreater ? 'ceil' : 'floor'](target / multiplier);
 export const nullTryReturn = <T, A>(action: (...args: A[]) => T, ...args: A[]): Nullable<T> => {
     try {
         return action(...args);
