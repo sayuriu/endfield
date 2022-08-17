@@ -44,7 +44,7 @@ export class AssetLoader {
         const xhr = new XMLHttpRequest();
         if (request.metadata.mimeType) xhr.overrideMimeType(request.metadata.mimeType);
         if (request.metadata.responseType) xhr.responseType = request.metadata.responseType;
-        xhr.open("GET", request.url, true);
+        xhr.open("GET", request.url);
         xhr.onprogress = (e) => {
             if (e.lengthComputable) {
                 request.progress = e.loaded / e.total;

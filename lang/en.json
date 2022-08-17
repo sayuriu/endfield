@@ -24,5 +24,10 @@
             }
         }
     },
-    "language": "Language"
+    "language": "Language",
+    "init-prgs-bar": {
+        "loading": "Loading",
+        "failed": "failed",
+        "ready": "Ready."
+    }
 }

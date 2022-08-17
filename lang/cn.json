@@ -24,5 +24,10 @@
             }
         }
     },
-    "language": "语言"
+    "language": "语言",
+    "init-prgs-bar": {
+        "loading": "加载",
+        "failed": "没成功",
+        "ready": "准备好了。"
+    }
 }

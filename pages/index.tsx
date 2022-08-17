@@ -7,7 +7,7 @@ import { Box } from "@chakra-ui/react";
 
 import { AvailableLanguages, ImageData, Language } from "@states/global";
 import { AssetLoader } from "@utils/loader";
-import { findNearestMultiple, localGet, localSet, Nullable, waitAsync } from "@utils/common";
+import { findNearestMultiple, localGet, localSet, Nullable, useLocale, waitAsync } from "@utils/common";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
@@ -15,6 +15,7 @@ import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big";
 import { LogoLarge_JP } from "@components/logo/JP/JP-big";
+import { MotionBox, MotionFlex } from '@components/chakra-motion';
 
 interface PageProps {
     lang: string,
@@ -42,9 +43,10 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
     const [introVisible, setIntroVisible] = useState(false);
     const [introFinished, setIntroFinished] = useState(false);
     const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
-
     const [currentLang, setCurrentLang] = useAtom(Language);
+
     const [, setImageData] = useAtom(ImageData);
+    const locale = useLocale(useAtom(Language)[0]);
 
     const loadDependencies = new Array(8)
         .fill(0)
@@ -158,7 +160,8 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
         <AnimatePresence>
             {
                 (progressPercentage !== 101) &&
-                <motion.div
+                <MotionBox
+                    fontFamily={"Jetbrains Mono"}
                     className="fw abs b0 l0"
                     exit={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -167,18 +170,19 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                         easings: [0.88,0, 0.22, 0],
                         delay: 0.2,
                     }}
+                    color={"#eee"}
                 >
-                    <Box as={"h1"} fontFamily={"Jetbrains Mono"} color={"#eee"}>
+                    <Box as={"h1"}>
                         {progressPercentage >= 100 ?
-                            'Ready.' :
+                            locale("init-prgs-bar.ready") :
                             (({ loaded, success }) => <>
-                                {progressPercentage}%&nbsp;
-                                <Box as={"span"} color={"#777"}>Loading {loaded} / {loadDependencies.length}</Box>
-                                { loaded !== success && <Box as={"span"} color={"#777"}>&nbsp;({loaded - success} failed)</Box> }
+                                <Box as={"span"} color={"#777"}>{progressPercentage}% {locale("init-prgs-bar.loading")} {loaded} / {loadDependencies.length}</Box>
+                                { loaded !== success && <Box as={"span"} color={"#777"}>&nbsp;({loaded - success} {locale("init-prgs-bar.failed")})</Box> }
                             </>)(progressData)
                         }
                     </Box>
-                    <motion.div
+                    <MotionFlex
+                        flexDir={"row-reverse"}
                         className="fw rel"
                         initial={{ width: 0, height: '20px', backgroundColor: '#fff' }}
                         animate={{ width: (progressPercentage > 100 ? 100 : progressPercentage) + '%' }}
@@ -187,9 +191,9 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                             easings: [0.88,-0.07, 0.22, 1.01],
                         }}
                     >
-
-                    </motion.div>
-                </motion.div>
+                        {/*<Box as={"h1"} m={"auto 0 auto auto"} mixBlendMode={"exclusion"}></Box>*/}
+                    </MotionFlex>
+                </MotionBox>
             }
             {introVisible && <IntroLogo key="intro-logo"/>}
             { currentLang === 'en' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
