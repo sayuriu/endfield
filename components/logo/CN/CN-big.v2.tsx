@@ -65,9 +65,9 @@ export const LogoLarge_CN: FC<HasAnimation> = ({dontAnimateChild}) => {
                 </g>
             </g>
 
-            <rect className={styles["cover"]} x="0" y="73.4" width="33.1" height="30.1" data-inverse=""/>
-            <rect className={styles["cover-char-3"]} x="0" y="43.7" width="33.1" height="30.1" data-inverse=""/>
-            <rect id={styles["inverse"]} fill="white" x="0" y="43.83" width="33.1" height="30.1"/>
+            <rect className={styles["cover"]} x="0.13" y="73.4" width="32.34" height="30.1" data-inverse=""/>
+            <rect className={styles["cover-char-3"]} x="0.13" y="43.7" width="32.34" height="30.1" data-inverse=""/>
+            <rect id={styles["inverse"]} fill="white" x="0.17" y="43.82" width="32.24" height="30.1"/>
             <path className={styles["en-square"]} d="M62.4 43.688H32.3V73.788H62.4V43.688Z" stroke="white" strokeWidth="0.15"/>
             <g id={styles["en"]}>
                 <g className={styles["arknights"]}>
