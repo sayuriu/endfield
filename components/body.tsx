@@ -122,7 +122,7 @@ const SectionTitle = ({ text }: { text: string }) => {
             <Box
                 as={"p"}
                 fontFamily={"Oswald"}
-                fontWeight={"500"}
+                fontWeight={"bold"}
                 fontSize={"100"}
                 color={"#fff"}
                 textAlign={"left"}
