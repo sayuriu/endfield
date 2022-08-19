@@ -13,7 +13,7 @@ import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
 import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
-import { LogoLarge_CN } from "@components/logo/CN/CN-big";
+import { LogoLarge_CN } from "@components/logo/CN/CN-big.v2";
 import { LogoLarge_JP } from "@components/logo/JP/JP-big";
 import { MotionBox, MotionFlex } from '@components/chakra-motion';
 
@@ -171,6 +171,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                         delay: 0.2,
                     }}
                     color={"#eee"}
+                    zIndex={1}
                 >
                     <Box as={"h1"}>
                         {progressPercentage >= 100 ?
@@ -196,9 +197,9 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                 </MotionBox>
             }
             {introVisible && <IntroLogo key="intro-logo"/>}
-            { currentLang === 'en' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
-            { currentLang === 'cn' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
-            { currentLang === 'jp' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
+            { currentLang === 'en' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            { currentLang === 'cn' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
+            { currentLang === 'jp' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
             {/*kr <Component "LogoLargeKR" @child>*/}
         </AnimatePresence>
         {finishedLoading && progressPercentage === 101 && <>

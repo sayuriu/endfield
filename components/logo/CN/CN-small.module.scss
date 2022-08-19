@@ -84,7 +84,7 @@ $logo-anim-delay: 0s;
                 transform: translateY(10px);
                 animation:
                     slide_DU
-                        0.7s endfieldCNAnimDelay(.4s) $forceful forwards;
+                        0.7s endfieldCNAnimDelay(.35s) $forceful forwards;
             }
             .arknights { --order: 1 }
             .endfield { --order: 2 }
