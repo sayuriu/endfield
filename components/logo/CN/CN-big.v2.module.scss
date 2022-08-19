@@ -1,0 +1,390 @@
+@import 'styles/anims';
+
+$logo-anim-delay: 0s;
+.logo {
+    width: clamp(700px, 100%, 2000px);
+    height: clamp(400px, 100%, 1000px);
+    path, rect, .en-square {
+        fill: #fff;
+    }
+    *[data-inverse] {
+        fill: #000;
+    }
+    *[char-outline] {
+        stroke: #fff;
+        stroke-width: 0px;
+    }
+    .main-t, .main-b, .char-2 {
+        stroke-width: 0.15px;
+        stroke: #fff
+    }
+
+    #en g {
+        mix-blend-mode: exclusion;
+    }
+    #en g {
+        mix-blend-mode: exclusion;
+    }
+    $endfield-cn-chr3-delay: calc(#{$logo-anim-delay} + 2.3s);
+    #cn {
+        $arknights-cn-anim-delay: calc(#{$logo-anim-delay} + 0s);
+        .arknights path {
+            opacity: 0;
+            transform: translateY(-10px);
+
+            $delay: calc(
+                #{applyPlaybackSpeed(#{$arknights-cn-anim-delay})} +
+                #{applyPlaybackSpeed(0.05s)} * var(--order)
+            );
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.5s)
+                #{$delay} steps(1) forwards,
+                slide_UD
+                applyPlaybackSpeed(0.8s)
+                #{$delay} $forceful forwards;
+        }
+        .endfield {
+            g {
+                path, rect { opacity: 0; }
+            }
+            $endfield-cn-chr1-delay: calc(#{$logo-anim-delay} + 0.8s);
+            .char-1 {
+                #stroke-tl-1 {
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr1-delay})
+                        steps(1) forwards,
+                        slide_LR
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr1-delay})
+                        $forceful forwards;
+                }
+                #main-t {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.1s);
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay})
+                        steps(1) forwards,
+                        slide_DU
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$delay})
+                        $forceful forwards;
+                }
+                #main-t-inner-l {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.15s);
+                    // M12.5 31.767   L9.1 31.767   L11.6 26.388  L13.9 26.388 L15.7 23.888 L18.4 27.667  L12.5 31.767Z
+                    // M12.5 29.888   L9.1 29.888   L11.6 26.388  L13.9 26.388 L15.7 23.888 L18.4 25.788  L12.5 29.888Z
+                    // M12.5 29.888   H9.10         L11.6 26.388  H13.9        L15.7 23.888 L18.4 25.788  L12.5 29.888Z
+                    @keyframes main-t-inner-l_path {
+                        from { d: path("M12.5,31.767l-3.4,0l2.5,-5.379l2.3,0l1.8,-2.5l2.7,3.779l-5.9,4.1z"); }
+                        to { d: path("M12.5,29.8879l-3.4,0l2.5,-3.5l2.3,0l1.8,-2.5l2.7,1.9l-5.9,4.1z"); }
+                    }
+                    @keyframes main-t-inner-l_translate {
+                        from { transform: translateY(-20px) scaleY(2.5); }
+                        to { transform: translateY(0) scaleY(1); }
+                    }
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay})
+                        steps(1) forwards,
+                        main-t-inner-l_translate
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(calc(#{$delay} + 0.1s))
+                        $slow-down forwards,
+                        main-t-inner-l_path
+                        applyPlaybackSpeed(0.8s)
+                        applyPlaybackSpeed(calc(#{$delay} + 0.1s))
+                        $slow-down forwards;
+                }
+                #main-t-inner-r {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.15s);
+                    @keyframes main-t-inner-r_translate {
+                        from { transform: translateY(0px) scaleY(2.5); }
+                        to { transform: translateY(0) scaleY(1); }
+                    }
+                    // M22.053 26.821 L18.9 21.088 H25.1 L22.053 26.821Z
+                    // M21.95  22.788 L18.9 21.088 H25.1 L21.95  22.788Z
+                    @keyframes main-t-inner-r_path {
+                        from { d: path("M22.053,26.821l-3.153,-5.733h6.2l-3.047,5.733z"); }
+                        to { d: path("M21.95,22.788l-3.05,-1.7h6.2l-3.15,1.7z"); }
+                    }
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                        main-t-inner-r_translate
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(calc(#{$delay} + 0.1s)) $slow-down forwards,
+                        main-t-inner-r_path
+                        applyPlaybackSpeed(0.8s)
+                        applyPlaybackSpeed(calc(#{$delay} + 0.1s)) $slow-down forwards;
+                }
+                #stroke-bl-1 {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.3s);
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                        slide_DU
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$delay}) $forceful forwards;
+                }
+                #stroke-bl-2 {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.35s);
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                        slide_DU
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$delay}) $forceful forwards;
+                }
+                #main-b {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.45s);
+                    // M12,37.6 V29.8 H14.5 L17.785,27.4 L27.614,34.635 L31.805,37.6   L24.385,37.6 L16.505,32.01 L16.505,37.61 V37.61Z
+                    // M12,37.6 V29.8 H14.5 L17.785,27.4 L28.085,34.4   L31.805,31.85  L31.805,37.6 L24.385,37.6  L16.505,32.01 V37.61Z
+
+                    // M12.3 43.688 L 12.3 35.888 L 14.8 35.888 L18.085 33.488 L28.259 40.74 L32.136 43.622 L32.105 43.652  L24.671 43.652   L16.805 38.098 L16.805 43.698Z
+                    // M12.3 43.688 L 12.3 35.888 L 14.8 35.888 L18.085 33.488 L28.385 40.488L32.105 37.86  L32.105 43.6523 L24.6714 43.6523 L16.805 38.098 L16.805 43.698Z
+                    d: path("M12.3 43.688 L 12.3 35.888 L 14.8 35.888 L18.085 33.488 L28.259 40.74 L32.136 43.622 L32.105 43.652  L24.671 43.652   L16.805 38.098 L16.805 43.698Z");
+                    @keyframes main-b_path {
+                        from { d: path("M12.3 43.688 L 12.3 35.888 L 14.8 35.888 L18.085 33.488 L28.259 40.74 L32.136 43.622 L32.105 43.652  L24.671 43.652   L16.805 38.098 L16.805 43.698Z"); }
+                        to {   d: path("M12.3 43.688 L 12.3 35.888 L 14.8 35.888 L18.085 33.488 L28.385 40.488L32.105 37.86  L32.105 43.6523 L24.6714 43.6523 L16.805 38.098 L16.805 43.698Z"); }
+                    }
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                        slide_LR
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$delay}) $forceful forwards,
+                        main-b_path
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(calc(#{$delay} + 0.4s)) $forceful forwards,
+                }
+                #stroke-br-1 {
+                    $delay: calc(#{$endfield-cn-chr1-delay} + 0.52s);
+                    @keyframes stroke-br-1_translate {
+                        from { transform: translate(-3px, -2px); }
+                        to { transform: translate(0, 0); }
+                    }
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.3s)
+                        applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                        stroke-br-1_translate
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$delay}) $forceful forwards;
+                }
+            }
+            $endfield-cn-chr2-delay: calc(#{$endfield-cn-chr1-delay} - 0.2s);
+            .char-2 {
+                .corner-o {
+                    transform-origin: 150px 84px;
+                    transform: scale(1.2);
+                    @keyframes chr2-cO {
+                        from {
+                            transform: scale(1.2);
+                            transform-origin: 150px 84px;
+                        }
+                        60% {
+                            opacity: 1;
+                        }
+                        80% {
+                            transform: scale(1.05);
+                            transform-origin: 348px 278px;
+                        }
+                        to { opacity: 0; }
+                    }
+                    animation:
+                        chr2-cO
+                        applyPlaybackSpeed(1.5s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr2-delay})
+                        steps(1) forwards;
+                }
+                .corner-i {
+                    opacity: 1;
+                    @keyframes chr2-cI {
+                        from { opacity: 0; }
+                        50% { opacity: 1; }
+                        60% { opacity: 0; }
+                        90% { opacity: 1; }
+                        to { opacity: 0; }
+                    }
+                    animation:
+                        chr2-cI
+                        applyPlaybackSpeed(1.5s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr2-delay})
+                        steps(1) forwards;
+                }
+                .main {
+                    @keyframes chr2-main {
+                        from {}
+                        50% {
+                            opacity: 1;
+                            clip-path: polygon(0 70%, 30% 70%, 30% 100%, 0 100%);
+                        }
+                        75% {
+                            clip-path: polygon(5% 60%, 40% 60%, 40% 85%, 5% 85%);
+                        }
+                        90% {
+                            clip-path: polygon(0 0, 100% 0, 100% 100%, 0 100%);
+                        }
+                        to { opacity: 1 }
+                    }
+                    animation:
+                        chr2-main
+                        applyPlaybackSpeed(1.5s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr2-delay})
+                        steps(1) forwards;
+                }
+                .fragment-l {
+                    clip-path: polygon(0 0, 45% 0, 45% 45%, 0 45%);
+                    transform: translate(0, 0);
+                    @keyframes chr2-fL {
+                        20% { opacity: 1; }
+                        40% { transform: translate(0, -8px) }
+                        80% { transform: translate(0, 0) }
+                    }
+                    animation:
+                        chr2-fL
+                        applyPlaybackSpeed(1.5s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr2-delay})
+                        steps(1) forwards;
+                }
+                .fragment-r {
+                    clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+                    @keyframes chr2-fR {
+                        30% {
+                            opacity: 1;
+                        }
+                        50% {
+                            clip-path: polygon(50% 0%, 100% 0%, 100% 40%, 50% 40%);
+                        }
+                        70% {
+                            clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+                        }
+                        to {
+
+                        }
+                    }
+                    animation:
+                        chr2-fR
+                        applyPlaybackSpeed(1.5s)
+                        applyPlaybackSpeed(#{$endfield-cn-chr2-delay})
+                        steps(1) forwards;
+                }
+            }
+        }
+        .char-3 {
+            .l {
+                opacity: 1;
+                transform: translateY(8px);
+                $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+                @keyframes chr3-l-slide {
+                    from { transform: translateY(8px) }
+                    to { transform: translateY(0) }
+                }
+                animation:
+                    chr3-l-slide
+                    applyPlaybackSpeed(0.8s)
+                    applyPlaybackSpeed(#{$delay})
+                    $slow-down forwards;
+            }
+            .r {
+                opacity: 1;
+                transform: translateY(4.5px);
+                $delay: calc(#{$endfield-cn-chr3-delay} + 0.13s);
+                @keyframes chr3-r-slide {
+                    from { transform: translateY(4.5px) }
+                    to { transform: translateY(0) }
+                }
+                animation:
+                    chr3-r-slide
+                    applyPlaybackSpeed(0.8s)
+                    applyPlaybackSpeed(#{$delay})
+                    $slow-down forwards;
+            }
+        }
+    }
+    #en {
+        $en-arknights-anim-delay: 3.2s;
+        .arknights path {
+            opacity: 0;
+            transform: translateY(10px);
+            // applyPlaybackSpeed(0.02s) * var(--order)
+            $delay: calc(#{applyPlaybackSpeed(#{$en-arknights-anim-delay})});
+            animation:
+                opacity_spawn
+                #{applyPlaybackSpeed(0.5s)}
+                #{$delay} steps(1) forwards,
+                slide_DU
+                #{applyPlaybackSpeed(0.8s)}
+                #{$delay} $forceful forwards;
+        }
+
+        // $en-endfield-anim-delay: 3.4s;
+        $en-endfield-anim-delay: 3.35s;
+        .endfield path {
+            opacity: 0;
+            transform: translateY(10px);
+            // applyPlaybackSpeed(0.02s) * var(--order)
+            $delay: calc(
+                #{applyPlaybackSpeed(#{$en-endfield-anim-delay})}
+            );
+            animation:
+                opacity_spawn
+                #{applyPlaybackSpeed(0.5s)}
+                #{$delay} steps(1) forwards,
+                slide_DU
+                #{applyPlaybackSpeed(0.7s)}
+                #{$delay} $forceful forwards;
+        }
+    }
+    #inverse {
+        mix-blend-mode: exclusion;
+        clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%);
+        $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+        animation:
+            expand_DU
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards,
+            collapse_DU
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(calc(#{$delay} + 0.8s))
+            $slow-down forwards,
+    }
+    .cover-char-3 {
+        $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+        animation:
+            collapse_DU
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards,
+    }
+    .cover {
+        y: 73.38px;
+        $delay: calc(#{$endfield-cn-chr3-delay} + 0.1s);
+        @keyframes cover-slide {
+            from { y: 73.38px }
+            to { y: 73.82px }
+        }
+        animation:
+            cover-slide
+            applyPlaybackSpeed(0.3s)
+            applyPlaybackSpeed(#{$delay})
+            $forceful forwards,
+    }
+    .en-square {
+        $delay: applyPlaybackSpeed(3.2s);
+        clip-path: polygon(0 0, 0 0, 0 100%, 0 100%);
+        animation:
+            expand_LR
+            applyPlaybackSpeed(0.5s) #{$delay} $forceful forwards,
+    }
+}

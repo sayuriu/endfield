@@ -171,7 +171,7 @@ const InfoDialogue = () => {
                     padding: "1em 0.8em",
                     marginBottom: "1.2em",
                     fontFamily: "Oswald",
-                    fontWeight: "300",
+                    fontWeight: "lighter",
                     fontSize: "1.3em",
                     backgroundColor: "#E8E8E8",
                 }}
