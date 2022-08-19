@@ -24,5 +24,10 @@
             }
         }
     },
-    "language": "言語"
+    "language": "言語",
+    "init-prgs-bar": {
+        "loading": "ローディング",
+        "failed": "回失敗",
+        "ready": "できあがり。"
+    }
 }

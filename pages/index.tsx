@@ -6,16 +6,16 @@ import { AnimatePresence, motion } from "framer-motion";
 import { Box } from "@chakra-ui/react";
 
 import { AvailableLanguages, ImageData, Language } from "@states/global";
-import { AssetLoader, RequestData } from "@utils/loader";
-import { localGet, localSet, Nullable, waitAsync } from "@utils/common";
-import { InitProgressBar } from "@components/InitProgressBar/InitProgressBar";
+import { AssetLoader } from "@utils/loader";
+import { findNearestMultiple, localGet, localSet, Nullable, useLocale, waitAsync } from "@utils/common";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
 import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
-import { LogoLarge_CN } from "@components/logo/CN/CN-big";
+import { LogoLarge_CN } from "@components/logo/CN/CN-big.v2";
 import { LogoLarge_JP } from "@components/logo/JP/JP-big";
+import { MotionBox, MotionFlex } from '@components/chakra-motion';
 
 interface PageProps {
     lang: string,
@@ -35,30 +35,29 @@ function getIntroAnimSpeed(lang: string)
     }
 }
 
-const buildProgressTitle = (requestData: RequestData[]) => {
-    let success = 0, failed = 0;
-    for (const request of requestData) {
-        if (request.progress !== 1) continue;
-        request.success ? success++ : failed++;
-    }
-    let out = `${success + failed}/${requestData.length}`;
-    if (success > 0) out += ` (${success} success)`;
-    if (failed > 0) out += ` (${failed} failed)`;
-    return out;
-};
 
 const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
     const [progressPercentage , setProgressPercentage] = useState(0);
-    const [progressString, setProgressString] = useState("0% loading");
-
     const [finishedLoading, setFinishedLoading] = useState(false);
     const [logoVisible, setLogoVisible] = useState(false);
     const [introVisible, setIntroVisible] = useState(false);
     const [introFinished, setIntroFinished] = useState(false);
     const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
-
     const [currentLang, setCurrentLang] = useAtom(Language);
+
     const [, setImageData] = useAtom(ImageData);
+    const locale = useLocale(useAtom(Language)[0]);
+
+    const loadDependencies = new Array(8)
+        .fill(0)
+        .map((_, i) => ({ url: `img/0${i + 1}_HD.jpg`, overrideOption: { mimeType: 'image/jpeg' } }));
+
+    const [progressData, setProgressData] = useState({
+        total: loadDependencies.length,
+        loaded: 0,
+        success: 0,
+        _lastPercentage: 0,
+    });
 
     const router = useRouter();
     if (!fullIntro && 'fullIntro' in router.query)
@@ -101,15 +100,34 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
         setDontAnimate(animateLogo ? null : true);
         (async () => {
             const loader = new AssetLoader(
-                new Array(8)
-                    .fill(0)
-                    .map((_, i) => ({ url: `img/0${i + 1}_HD.jpg`, overrideOption: { mimeType: 'image/jpeg' } })),
+                loadDependencies,
                 {
                     responseType: 'arraybuffer',
-                    onProgressUpdate: (v) => {
+                    onProgressUpdate: (v, requests) => {
                         const percentage = Math.floor(v * 100);
+                        setProgressData(prev => {
+                            if (percentage >= findNearestMultiple(100 / requests.length, prev._lastPercentage)) {
+                                let success = 0, loaded = 0;
+                                for (const request of requests)
+                                {
+                                    if (request.success)
+                                    {
+                                        success++;
+                                        continue;
+                                    }
+                                    if (request.progress === 1)
+                                        loaded++;
+                                }
+                                return {
+                                    total: requests.length,
+                                    loaded: loaded + success,
+                                    success,
+                                    _lastPercentage: percentage
+                                };
+                            }
+                            return prev;
+                        });
                         setProgressPercentage(percentage);
-                        setProgressString(() => percentage === 100 ? 'Ready.' : `${percentage}% loading ${buildProgressTitle(loader.requests)}`);
                     }
                 }
             );
@@ -142,7 +160,8 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
         <AnimatePresence>
             {
                 (progressPercentage !== 101) &&
-                <motion.div
+                <MotionBox
+                    fontFamily={"Jetbrains Mono"}
                     className="fw abs b0 l0"
                     exit={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
@@ -151,8 +170,20 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                         easings: [0.88,0, 0.22, 0],
                         delay: 0.2,
                     }}
+                    color={"#eee"}
+                    zIndex={1}
                 >
-                    <motion.div
+                    <Box as={"h1"}>
+                        {progressPercentage >= 100 ?
+                            locale("init-prgs-bar.ready") :
+                            (({ loaded, success }) => <>
+                                <Box as={"span"} color={"#777"}>{progressPercentage}% {locale("init-prgs-bar.loading")} {loaded} / {loadDependencies.length}</Box>
+                                { loaded !== success && <Box as={"span"} color={"#777"}>&nbsp;({loaded - success} {locale("init-prgs-bar.failed")})</Box> }
+                            </>)(progressData)
+                        }
+                    </Box>
+                    <MotionFlex
+                        flexDir={"row-reverse"}
                         className="fw rel"
                         initial={{ width: 0, height: '20px', backgroundColor: '#fff' }}
                         animate={{ width: (progressPercentage > 100 ? 100 : progressPercentage) + '%' }}
@@ -161,14 +192,14 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                             easings: [0.88,-0.07, 0.22, 1.01],
                         }}
                     >
-
-                    </motion.div>
-                </motion.div>
+                        {/*<Box as={"h1"} m={"auto 0 auto auto"} mixBlendMode={"exclusion"}></Box>*/}
+                    </MotionFlex>
+                </MotionBox>
             }
             {introVisible && <IntroLogo key="intro-logo"/>}
-            { currentLang === 'en' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
-            { currentLang === 'cn' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
-            { currentLang === 'jp' && ((logoVisible || progressPercentage < 100) && introFinished) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
+            { currentLang === 'en' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
+            { currentLang === 'cn' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
+            { currentLang === 'jp' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
             {/*kr <Component "LogoLargeKR" @child>*/}
         </AnimatePresence>
         {finishedLoading && progressPercentage === 101 && <>

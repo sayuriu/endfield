@@ -13,7 +13,7 @@ export interface RequestData {
 interface RequestOptions {
     mimeType?: string;
     responseType?: ResponseDataT;
-    onProgressUpdate?: (progress: number) => void;
+    onProgressUpdate?: (progress: number, requests: RequestData[]) => void;
 }
 
 export class AssetLoader {
@@ -21,7 +21,7 @@ export class AssetLoader {
     totalProgress = 0;
     pollingTimeout?: boolean;
     resolve?: (value: RequestData[]) => void;
-    onProgressUpdate?: (progress: number) => void;
+    onProgressUpdate?: (progress: number, requests: RequestData[]) => void;
 
     constructor(requests: { url: string, overrideOptions?: ExcludeKey<RequestOptions, 'onProgressUpdate'> }[], options: RequestOptions = {}) {
         this.onProgressUpdate = options.onProgressUpdate;
@@ -44,7 +44,7 @@ export class AssetLoader {
         const xhr = new XMLHttpRequest();
         if (request.metadata.mimeType) xhr.overrideMimeType(request.metadata.mimeType);
         if (request.metadata.responseType) xhr.responseType = request.metadata.responseType;
-        xhr.open("GET", request.url, true);
+        xhr.open("GET", request.url);
         xhr.onprogress = (e) => {
             if (e.lengthComputable) {
                 request.progress = e.loaded / e.total;
@@ -75,7 +75,7 @@ export class AssetLoader {
             return;
         }
         this.totalProgress = this.requests.reduce((acc, { progress }) => acc + progress, 0) / this.requests.length;
-        this.onProgressUpdate?.(this.totalProgress);
+        this.onProgressUpdate?.(this.totalProgress, this.requests);
 
         setTimeout(() => {
             delete this.pollingTimeout;
