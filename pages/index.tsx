@@ -2,12 +2,12 @@ import type { NextPage } from 'next';
 import { useRouter } from 'next/router';
 import { useAtom } from "jotai";
 import { useEffect, useState } from 'react';
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 import { Box } from "@chakra-ui/react";
 
-import { AvailableLanguages, ImageData, Language } from "@states/global";
+import { AvailableLanguages, ImageData, Language, LanguagePack } from "@states/global";
 import { AssetLoader } from "@utils/loader";
-import { findNearestMultiple, localGet, localSet, Nullable, useLocale, waitAsync } from "@utils/common";
+import { findNearestMultiple, LanguagePack as _LanguagePack, localGet, localSet, Nullable, useLocale, waitAsync } from "@utils/common";
 import { Footer } from "@components/footer";
 import { Header } from '@components/header';
 import { IntroLogo } from "@components/logo/IntroLogo";
@@ -15,10 +15,12 @@ import { Body } from '@components/body';
 import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big.v2";
 import { LogoLarge_JP } from "@components/logo/JP/JP-big";
+import { LogoLarge_KR } from "@components/logo/KR/KR-big";
 import { MotionBox, MotionFlex } from '@components/chakra-motion';
 
 interface PageProps {
     lang: string,
+    langPack: string,
     fullIntro: Nullable<string>,
 }
 
@@ -32,25 +34,43 @@ function getIntroAnimSpeed(lang: string)
             return 1.545;
         case 'jp':
             return 2.3;
+        case 'kr':
+            return 1.8;
     }
 }
 
+function getPostIntroAnimSpeed(lang: string)
+{
+    switch (lang) {
+        default:
+            return null;
+        case 'kr':
+            return 1.5;
+    }
+}
 
-const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
+const Home: NextPage<PageProps> = ({ lang, fullIntro, langPack }) => {
     const [progressPercentage , setProgressPercentage] = useState(0);
     const [finishedLoading, setFinishedLoading] = useState(false);
     const [logoVisible, setLogoVisible] = useState(false);
     const [introVisible, setIntroVisible] = useState(false);
     const [introFinished, setIntroFinished] = useState(false);
     const [dontAnimate, setDontAnimate] = useState<Nullable<boolean>>(true);
+
+    const initalLangPack: Partial<_LanguagePack> = { [lang]: JSON.parse(langPack) };
     const [currentLang, setCurrentLang] = useAtom(Language);
-
+    const [, setLangPack] = useAtom(LanguagePack);
     const [, setImageData] = useAtom(ImageData);
-    const locale = useLocale(useAtom(Language)[0]);
+    const locale = useLocale(useAtom(Language)[0], initalLangPack);
 
-    const loadDependencies = new Array(8)
-        .fill(0)
-        .map((_, i) => ({ url: `img/0${i + 1}_HD.jpg`, overrideOption: { mimeType: 'image/jpeg' } }));
+    const loadDependencies = [
+        ...new Array(8)
+            .fill(0)
+            .map((_, i) => ({ url: `assets/img/0${i + 1}_HD.jpg`, overrideOptions: { mimeType: 'image/jpeg' } })),
+        ...AvailableLanguages
+            .filter(l => l !== lang)
+            .map(l => ({ url: `assets/lang/${l}.json`, overrideOptions: { responseType: 'json', mimeType: 'application/json' } })),
+    ];
 
     const [progressData, setProgressData] = useState({
         total: loadDependencies.length,
@@ -64,6 +84,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
         fullIntro = router.query.fullIntro?.toString() ?? null;
 
     useEffect(() => {
+        setLangPack(initalLangPack);
         if (currentLang !== lang) setCurrentLang(lang);
         if (localGet('fullIntro') === 'true' && fullIntro === null)
             void router.push({
@@ -133,13 +154,26 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
             );
             loader.await().then(resolved => {
                 setProgressPercentage(100);
-                const imageData = new Map<string, string>(
-                    resolved.map(({ url, resolved: data }) => [
-                        url,
-                        !!data ?
-                            URL.createObjectURL(new Blob([data as Blob]))
-                            : 'null'
-                    ]));
+                const imageData = new Map<string, string>();
+                const langPack: Partial<_LanguagePack> = {};
+                for (const data of resolved)
+                {
+                    if (data.url.includes('lang/'))
+                        langPack[
+                            data.url
+                                .split('/')
+                                .at(-1)!
+                                .split('.')[0] as keyof _LanguagePack
+                            ] = data.resolved as Record<string, any>;
+                    if (data.url.includes('img/'))
+                        imageData.set(
+                            data.url,
+                            data.resolved ?
+                                URL.createObjectURL(new Blob([data.resolved as Blob]))
+                                : 'null'
+                        );
+                }
+                setLangPack(langPack);
                 setImageData(imageData);
                 waitAsync(500).then(() => setProgressPercentage(() => 101));
             });
@@ -150,7 +184,12 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                 setIntroFinished(() => true);
             });
             await waitAsync(animateLogo ? 6500 : 1200)
-                .then(() => setLogoVisible(() => false));
+                .then(() => {
+                    setLogoVisible(() => false);
+                    const postIntroAnimSpeed = getPostIntroAnimSpeed(lang ?? '');
+                    if (postIntroAnimSpeed)
+                        document.body.style.setProperty('--anim-playback-rate', postIntroAnimSpeed.toString());
+                });
             await waitAsync(500)
                 .then(() => setFinishedLoading(() => true));
         })();
@@ -159,7 +198,7 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
     return <div className="rel fw fh flex j-flex-center a-flex-center">
         <AnimatePresence>
             {
-                (progressPercentage !== 101) &&
+                (progressPercentage < 101) &&
                 <MotionBox
                     fontFamily={"Jetbrains Mono"}
                     className="fw abs b0 l0"
@@ -196,11 +235,23 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro }) => {
                     </MotionFlex>
                 </MotionBox>
             }
-            {introVisible && <IntroLogo key="intro-logo"/>}
-            { currentLang === 'en' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_EN dontAnimateChild={dontAnimate} key="logo-enfield-en"/>}
-            { currentLang === 'cn' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_CN dontAnimateChild={dontAnimate} key="logo-enfield-cn"/>}
-            { currentLang === 'jp' && ((logoVisible || progressPercentage < 101) && introFinished) && <LogoLarge_JP dontAnimateChild={dontAnimate} key="logo-enfield-jp"/>}
-            {/*kr <Component "LogoLargeKR" @child>*/}
+            { introVisible && <IntroLogo key="intro-logo"/>}
+            {(() => {
+                if (!((logoVisible || progressPercentage < 101) && introFinished))
+                    return null;
+                const config = { dontAnimateChild: dontAnimate, key: `logo-endfield-${currentLang}` };
+                switch (currentLang)
+                {
+                    case 'en':
+                        return <LogoLarge_EN {...config}/>;
+                    case 'cn':
+                        return <LogoLarge_CN {...config}/>;
+                    case 'jp':
+                        return <LogoLarge_JP {...config}/>;
+                    case 'kr':
+                        return <LogoLarge_KR {...config}/>;
+                }
+            })()}
         </AnimatePresence>
         {finishedLoading && progressPercentage === 101 && <>
             <Body key="body"/>
@@ -215,9 +266,11 @@ export async function getServerSideProps(context: { query: Record<string, string
     let lang = 'en';
     if (AvailableLanguages.includes(context.query.lang ?? ''))
         lang = context.query.lang as string;
+    const langPack = await import(`../lang/${lang}.json`);
     return {
         props:{
             lang,
+            langPack: JSON.stringify(langPack),
             fullIntro: context.query.fullIntro ?? null,
         }
     };

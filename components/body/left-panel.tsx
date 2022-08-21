@@ -96,7 +96,7 @@ export const LeftPanel: FC<IIndex> = ({
     const HandleScroll = async (event: WheelEvent) => {
         if (isAnimating) return;
         const down = event.deltaY > 0;
-        //                                             LOWER_INDEX_BOUND           UPPER_INDEX_BOUND
+        //                                    LOWER_INDEX_BOUND           UPPER_INDEX_BOUND
         await shiftNumberSequence(down, (indexMain < 2 && !down) || (indexMain > 2 && down));
     };
     const shiftNumberSequence = async (increment: boolean, wrap = false) => {

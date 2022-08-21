@@ -1,0 +1,219 @@
+@import "styles/anims";
+
+$logo-anim-delay: 0s;
+.logo {
+    path, #en-square {
+        fill: #fff;
+    }
+    path[data-inverse] {
+        fill: #000;
+    }
+    .no-fill {
+        fill: none;
+        stroke: #fff;
+    }
+    #arknights-kr {
+        $arknights-kr-anim-delay: calc(#{$logo-anim-delay} + 0s);
+        $delay: calc(
+            #{applyPlaybackSpeed(#{$arknights-kr-anim-delay})} +
+            #{applyPlaybackSpeed(0.05s)} * var(--order)
+        );
+        g {
+            opacity: 0;
+            transform: translateX(-10px);
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.5s)
+                #{$delay} steps(1) forwards,
+                slide_LR
+                applyPlaybackSpeed(0.8s)
+                #{$delay} $forceful forwards;
+        }
+
+        .char-1 .t-r,
+        .char-2 .t-l,
+        .char-2 .t-r,
+        .char-3 .t-r,
+        .char-4 .b {
+            transform: translateX(-0.78px);
+            animation:
+                reset-transform-x
+                applyPlaybackSpeed(1.1s)
+                #{$delay} $forceful forwards;
+        }
+
+        .char-2 .t-l { transform: translateX(-0.5px); }
+    }
+
+    #endfield-kr {
+        $endfield-kr-anim-delay: calc(#{$logo-anim-delay} + 0.5s);
+        & > * {
+            opacity: 0;
+        }
+        //#region row1
+        #movement-1 {
+            $movement-1-anim-delay: calc(#{$endfield-kr-anim-delay} + 0s);
+            transform: translateX(-10px);
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.3s)
+                applyPlaybackSpeed(#{$movement-1-anim-delay}) steps(1) forwards,
+                slide_LR
+                applyPlaybackSpeed(0.5s)
+                applyPlaybackSpeed(#{$movement-1-anim-delay})
+                $forceful forwards;
+
+            .group-1,
+            .char-2 {
+                transform: translateX(-6.26px);
+                animation:
+                    reset-transform-x
+                    applyPlaybackSpeed(1.2s)
+                    applyPlaybackSpeed(#{$movement-1-anim-delay})
+                    $slow-down forwards;
+            }
+            .group-1 {
+                transform: translateX(-2.26px);
+
+            }
+            .char-1.t-r {
+                transform-origin: 28.8px 28.78px;
+                transform: rotate(77.3deg);
+                fill: none;
+                stroke: #fff;
+                stroke-width: 0.2px;
+                @keyframes endfield-kr-m1-g1-shape {
+                    80%, to {
+                        fill: #fff;
+                        stroke-width: 0;
+                    }
+                }
+                animation:
+                    endfield-kr-m1-g1-shape
+                    applyPlaybackSpeed(1s)
+                    applyPlaybackSpeed(calc(#{$movement-1-anim-delay} + 0.8s))
+                    $slow-down forwards,
+                    reset-rotate
+                    applyPlaybackSpeed(0.6s)
+                    applyPlaybackSpeed(calc(#{$movement-1-anim-delay} + 0.6s))
+                    $forceful forwards;
+            }
+        }
+        $rest-delay-1: calc(#{$endfield-kr-anim-delay} + 0.6s);
+        .char-1.t-l,
+        .char-1.t-l-inner {
+            transform: translateY(-10px);
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.4s)
+                applyPlaybackSpeed(#{$rest-delay-1}) steps(1) forwards,
+                slide_UD
+                applyPlaybackSpeed(0.7s)
+                applyPlaybackSpeed(#{$rest-delay-1})
+                $forceful forwards;
+        }
+        .char-2.t {
+            transform: translateX(10px);
+            $delay: calc(#{$rest-delay-1} + 0.05s);
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.37s)
+                applyPlaybackSpeed(#{$delay}) steps(1) forwards,
+                slide_RL
+                applyPlaybackSpeed(0.67s)
+                applyPlaybackSpeed(#{$delay})
+                $forceful forwards;
+        }
+        //#endregion
+        //#region row2
+        $endfield-kr-chr3-delay: calc(#{$rest-delay-1} + 0.5s);
+        .char-3 {
+            transform: translateX(-10px);
+            animation:
+                opacity_spawn
+                applyPlaybackSpeed(0.3s)
+                applyPlaybackSpeed(#{$endfield-kr-chr3-delay}) steps(1) forwards,
+                slide_LR
+                applyPlaybackSpeed(0.5s)
+                applyPlaybackSpeed(#{$endfield-kr-chr3-delay})
+                $forceful forwards;
+            .t {
+                .r {
+                    transform: translateX(-3.74px);
+                    animation:
+                        reset-transform-x
+                        applyPlaybackSpeed(1.2s)
+                        applyPlaybackSpeed(#{$endfield-kr-chr3-delay})
+                        $slow-down forwards;
+                }
+            }
+            .b {
+                transform: translateY(-1.65px);
+                animation:
+                    reset-transform-y
+                    applyPlaybackSpeed(0.7s)
+                    applyPlaybackSpeed(calc(#{$endfield-kr-chr3-delay} + 0.52s))
+                    $forceful forwards;
+            }
+        }
+        $endfield-kr-chr4-delay: calc(#{$endfield-kr-chr3-delay} + 0.5s);
+        .char-4 {
+            opacity: 1;
+            clip-path: polygon(0 0, 100% 0, 100% 0, 0 0);
+            animation:
+                expand_UD
+                applyPlaybackSpeed(0.5s)
+                applyPlaybackSpeed(#{$endfield-kr-chr4-delay})
+                $forceful forwards;
+
+            $text-delay: calc(#{$endfield-kr-chr4-delay} + 0.05s * var(--order));
+            #en {
+                transform-origin: 47.8px 71px;
+                transform: scale(1.8);
+                .arknights,
+                .endfield {
+                    opacity: 0;
+                    transform: translateY(-10px);
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.5s)
+                        applyPlaybackSpeed(#{$text-delay}) steps(1) forwards,
+                        slide_UD
+                        applyPlaybackSpeed(0.8s)
+                        applyPlaybackSpeed(#{$text-delay})
+                        $slow-down forwards;
+                }
+            }
+            .b {
+                --order: 0;
+                d: path("M62.5584,70.1636h-29.328v-29.54h29.328v29.54z");
+                @keyframes enfield-kr-chr4-b-path {
+                    to { d: path("M62.5584,70.1636h-29.328v-5.571h29.328v5.571z"); }
+                }
+                animation:
+                    enfield-kr-chr4-b-path
+                    applyPlaybackSpeed(0.5s)
+                    applyPlaybackSpeed(calc(#{$text-delay} + 0.8s))
+                    $forceful forwards;
+            }
+            #en {
+                --order: 0;
+                animation:
+                    reset-scale
+                    applyPlaybackSpeed(0.55s)
+                    applyPlaybackSpeed(calc(#{$text-delay} + 0.85s))
+                    $slow-down forwards;
+            }
+            .t {
+                --order: 0;
+                transform: translateY(20px);
+                animation:
+                    reset-transform-y
+                    applyPlaybackSpeed(0.65s)
+                    applyPlaybackSpeed(calc(#{$text-delay} + 0.8s))
+                    $slow-down forwards;
+            }
+        }
+        //#endregion
+    }
+}

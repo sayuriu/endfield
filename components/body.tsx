@@ -1,22 +1,21 @@
 import Image from 'next/image';
-import { Box, Heading } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { Language, ImageData } from "@states/global";
+import { Language, ImageData, LanguagePack } from "@states/global";
 import { FC, useEffect, useState } from "react";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 
 import bodyStyles from './body/Body.module.scss';
 import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
-import { emptyFunc, joinClasses, useLocale, wait, waitAsync } from "@utils/common";
-import SlowDown = AnimFunctions.SlowDown;
+import { joinClasses, useLocale } from "@utils/common";
 import SpeedUp = AnimFunctions.SpeedUp;
 import { LeftPanel } from "@components/body/left-panel";
 import { RightPanel } from "@components/body/right-panel";
 import { MotionBox } from "@components/chakra-motion";
 
 export const Body = () => {
-    const locale = useLocale(useAtom(Language)[0]);
+    const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const [currentLanguage] = useAtom(Language);
     const [currentPage, setCurrentPage] = useState(1);
 
@@ -138,7 +137,7 @@ const SectionTitle = ({ text }: { text: string }) => {
 };
 
 const InfoDialogue = () => {
-    const locale = useLocale(useAtom(Language)[0]);
+    const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const [isExiting, setIsExiting] = useState(false);
     const [isShowing, setIsShowing] = useState(false);
     useEffect(() => () => {
@@ -247,7 +246,7 @@ const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
                 transition={{ duration: 0.5, ease: Forceful }}
             >
                 <Image
-                    src={imageData.get('img/05_HD.jpg')!}
+                    src={imageData.get('assets/img/05_HD.jpg')!}
                     alt={""}
                     quality={100}
                     priority

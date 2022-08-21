@@ -23,7 +23,7 @@ export class AssetLoader {
     resolve?: (value: RequestData[]) => void;
     onProgressUpdate?: (progress: number, requests: RequestData[]) => void;
 
-    constructor(requests: { url: string, overrideOptions?: ExcludeKey<RequestOptions, 'onProgressUpdate'> }[], options: RequestOptions = {}) {
+    constructor(requests: { url: string, overrideOptions?: Partial<ExcludeKey<RequestOptions, 'onProgressUpdate'> >}[], options: RequestOptions = {}) {
         this.onProgressUpdate = options.onProgressUpdate;
         delete options.onProgressUpdate;
         this.requests = requests.map(({ url, overrideOptions }) => ({

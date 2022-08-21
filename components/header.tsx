@@ -1,18 +1,20 @@
 import { useRouter } from "next/router";
 import { FC, ReactNode, useEffect, useState } from "react";
-import { Box, Flex } from "@chakra-ui/react";
+import { Box } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { AnimatePresence, motion } from "framer-motion";
+
+import { AvailableLanguages, Language, LanguagePack } from "@states/global";
+import { localGet, localSet, Nullable, OverridableStyle, useLocale } from "@utils/common";
 import { AnimFunctions } from "@utils/anims";
 import Forceful = AnimFunctions.Forceful;
 import SlowDown = AnimFunctions.SlowDown;
+import { MotionBox } from "./chakra-motion";
 import { LogoSmall_CN } from "@components/logo/CN/CN-small";
 import { LogoSmall_EN } from "@components/logo/EN/EN-small";
-import { Checkbox } from "@components/checkbox";
-import { AvailableLanguages, Language } from "@states/global";
-import { localGet, localSet, Nullable, OverridableStyle, useLocale } from "@utils/common";
 import { LogoSmall_JP } from "@components/logo/JP/JP-small";
-import { MotionBox } from "./chakra-motion";
+import { LogoSmall_KR } from "@components/logo/KR/KR-small";
+import { Checkbox } from "@components/checkbox";
 
 function resolveConfig(lang: Nullable<string>)
 {
@@ -30,9 +32,14 @@ function resolveConfig(lang: Nullable<string>)
             };
         case "jp":
             return {
-            marginLeft: "2.5%",
-            height: "85%"
-        };
+                marginLeft: "2.5%",
+                height: "85%"
+            };
+        case "kr":
+            return {
+                marginLeft: "2.5%",
+                height: "80%"
+            };
         default:
             return {
                 marginLeft: "auto",
@@ -96,6 +103,7 @@ export const Header: FC = () => {
                             {currentLanguage === 'cn' && <LogoSmall_CN key={"logo-endfield-cn-smol"}/>}
                             {currentLanguage === 'en' && <LogoSmall_EN key={"logo-endfield-en-smol"}/>}
                             {currentLanguage === 'jp' && <LogoSmall_JP key={"logo-endfield-jp-smol"}/>}
+                            {currentLanguage === 'kr' && <LogoSmall_KR key={"logo-endfield-kr-smol"}/>}
                         </AnimatePresence>
                     </Box>
                     <div/>
@@ -143,7 +151,7 @@ interface ISettingsToggle {
     onClick: () => void;
 }
 const SettingsToggle: FC<ISettingsToggle> = ({ active, onClick }) => {
-    const locale = useLocale(useAtom(Language)[0]);
+    const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const [isHover, setIsHover] = useState(false);
     const [isSmall, setIsSmall] = useState(false);
     useEffect(() => {
@@ -263,7 +271,7 @@ interface ISettings {
 }
 const SettingsUI: FC<ISettings> = ({ onLangChange }) => {
     const [lang] = useAtom(Language);
-    const locale = useLocale(lang);
+    const locale = useLocale(lang, useAtom(LanguagePack)[0]);
     const router = useRouter();
     const [fullIntro, setFullIntro] = useState(false);
     const [currentLanguage, setCurrentLanguage] = useState(lang);

@@ -1,14 +1,14 @@
 @font-face {
 	font-family: JetBrains Mono;
     /*noinspection CssUnknownTarget*/
-	src: url(/fonts/JetBrainsMono-Regular.ttf) format("truetype");
+	src: url(/assets/fonts/JetBrainsMono-Regular.ttf) format("truetype");
 	font-style: normal;
 	font-weight: normal;
 }
 @font-face {
 	font-family: JetBrains Mono;
     /*noinspection CssUnknownTarget*/
-	src: url(/fonts/JetBrainsMono-Bold.ttf) format("truetype");
+	src: url(/assets/fonts/JetBrainsMono-Bold.ttf) format("truetype");
 	font-style: normal;
 	font-weight: bold;
 }
@@ -16,7 +16,7 @@
 @font-face {
 	font-family: JetBrains Mono;
     /*noinspection CssUnknownTarget*/
-    src: url(/fonts/JetBrainsMono-Italic.ttf) format("truetype");
+    src: url(/assets/fonts/JetBrainsMono-Italic.ttf) format("truetype");
 	font-style: italic;
 	font-weight: normal;
 }
@@ -24,28 +24,28 @@
 @font-face {
     font-family: Oswald;
     /*noinspection CssUnknownTarget*/
-    src: url(/fonts/Oswald-Light.ttf) format("truetype");
+    src: url(/assets/fonts/Oswald-Light.ttf) format("truetype");
     font-style: normal;
     font-weight: 300;
 }
 @font-face {
 	font-family: Oswald;
     /*noinspection CssUnknownTarget*/
-    src: url(/fonts/Oswald-Regular.ttf) format("truetype");
+    src: url(/assets/fonts/Oswald-Regular.ttf) format("truetype");
 	font-style: normal;
 	font-weight: normal;
 }
 @font-face {
 	font-family: Oswald;
     /*noinspection CssUnknownTarget*/
-    src: url(/fonts/Oswald-SemiBold.ttf) format("truetype");
+    src: url(/assets/fonts/Oswald-SemiBold.ttf) format("truetype");
 	font-style: normal;
 	font-weight: 500;
 }
 @font-face {
 	font-family: Oswald;
     /*noinspection CssUnknownTarget*/
-    src: url(/fonts/Oswald-Bold.ttf) format("truetype");
+    src: url(/assets/fonts/Oswald-Bold.ttf) format("truetype");
 	font-style: normal;
 	font-weight: bold;
 }

@@ -1,7 +1,4 @@
 import { CSSProperties } from "react";
-import lang_en from "@lang/en.json";
-import lang_cn from "@lang/cn.json";
-import lang_jp from "@lang/jp.json";
 import { AvailableLanguages } from "@states/global";
 
 export type Nullable<T> = T | null;
@@ -40,33 +37,33 @@ export const localRemove = (key: string): void => void nullTryReturn((k) => loca
 
 export const whichWider = () => (window.innerWidth > window.innerHeight) ? 'width' : 'height';
 export const joinClasses = (...classes: string[]) => classes.filter(Boolean).join(' ');
+export const joinModuleClasses = (moduleStyle: Record<string, string>) => (...classes: string[]) => joinClasses(...classes.map(c => moduleStyle[c]));
 
 export const wait = (ms: number) => { const timeout = Date.now() + ms; while (Date.now() < timeout) {} };
 export const waitAsync = (ms: number): Promise<void> => new Promise(resolve => setTimeout(resolve, ms));
 export const emptyFunc = () => {};
 
-const lang_map = {
-    en: lang_en,
-    cn: lang_cn,
-    jp: lang_jp,
-};
+export type LanguagePack = {
+    [K in 'en' | 'jp' | 'cn' | 'kr']: Record<string, any>;
+}
 
-export function i18n(key: string, lang= 'en'): string {
+export function i18n(key: string, lang = 'en', langPack: LanguagePack | Partial<LanguagePack>): string {
     const keys = key.split('.');
     if (!AvailableLanguages.includes(lang))
         lang = 'en';
-    let data: Record<string, any> = lang_map[lang as keyof typeof lang_map];
+    let data: Record<string, any> | undefined = langPack[lang as keyof typeof langPack];
+    if (!data) return key;
     let level = 1;
     for (const subkey of keys)
     {
-        if (typeof data[subkey] === 'string' && level === keys.length)
-            return data[subkey];
-        if (!(subkey in data))
+        if (typeof data![subkey] === 'string' && level === keys.length)
+            return data![subkey];
+        if (!(subkey in data!))
             break;
-        data = data[subkey];
+        data = data![subkey];
         level++;
     }
-    return `{@${keys.copyWithin(0, level).join('.')}}`;
+    return `{@${keys.copyWithin(0, 0, level).join('.')}}`;
 }
 
-export const useLocale = (lang: string) => (key: string) => i18n(key, lang);
+export const useLocale = (lang: string, pack: LanguagePack | Partial<LanguagePack>) => (key: string) => i18n(key, lang, pack);
