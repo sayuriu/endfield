@@ -2,6 +2,8 @@
 
 $logo-anim-delay: 0s;
 .logo {
+    width: clamp(700px, 100%, 2000px);
+    height: clamp(400px, 80%, 500px);
     path, #en-square {
         fill: #fff;
     }
