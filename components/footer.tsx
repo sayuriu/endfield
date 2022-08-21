@@ -8,7 +8,7 @@ import { MountainContourLogo } from "@components/logo/MountainContour/MountainCo
 import { Anchor } from "@components/anchor";
 
 import terrainStyles from "./terrain.module.scss";
-import { Language } from "@states/global";
+import { Language, LanguagePack } from "@states/global";
 import { useAtom } from "jotai";
 const { Forceful, SlowDown } = AnimFunctions;
 
@@ -63,7 +63,7 @@ export const Footer:  FC = () => {
 };
 
 const FooterText: FC<{ lang: string }> = ({ lang }) => {
-    const locale = useLocale(lang);
+    const locale = useLocale(lang, useAtom(LanguagePack)[0]);
     const control = useAnimation();
     const sequence = async () => {
         await control.start({ opacity: 0 });

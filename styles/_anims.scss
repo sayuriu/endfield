@@ -67,3 +67,19 @@ $playback-speed: var(--anim-playback-rate);
     from { clip-path: polygon(0 0, 0 100%, 100% 100%, 100% 0) }
     to { clip-path: polygon(0 100%, 0 100%, 100% 100%, 100% 100%) }
 }
+@keyframes reset-transform-x {
+    to { transform: translateX(0) }
+}
+@keyframes reset-transform-y {
+    to { transform: translateY(0) }
+}
+@keyframes reset-transform-xy {
+    to { transform: translate(0, 0) }
+}
+@keyframes reset-rotate {
+    to { transform: rotate(0) }
+}
+@keyframes reset-scale {
+    to { transform: scale(1) }
+}
+

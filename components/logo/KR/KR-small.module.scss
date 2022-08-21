@@ -1,0 +1,162 @@
+@import "styles/anims";
+
+$logo-anim-delay: 0s;
+.logo {
+    max-width: 300px;
+    path, #en-square {
+        fill: #fff;
+    }
+    path[data-inverse] {
+        fill: #000;
+    }
+    .no-fill {
+        fill: none;
+        stroke: #fff;
+    }
+    *[char-outline] {
+        stroke: #fff;
+        stroke-width: 0;
+    }
+    &:not([data-noanim]) {
+        .arknights-kr {
+            $arknights-kr-anim-delay: calc(#{$logo-anim-delay} + 0s);
+            $delay: calc(
+                #{applyPlaybackSpeed(#{$arknights-kr-anim-delay})} +
+                #{applyPlaybackSpeed(0.05s)} * var(--order)
+            );
+            g {
+                opacity: 0;
+                transform: translateY(-10px);
+                animation:
+                    opacity_spawn
+                    applyPlaybackSpeed(0.5s)
+                    #{$delay} steps(1) forwards,
+                    slide_UD
+                    applyPlaybackSpeed(0.8s)
+                    #{$delay} $forceful forwards;
+            }
+        }
+        .endfield-kr {
+            $endfield-kr-anim-delay: calc(#{$logo-anim-delay} + 0.5s);
+            $chr1-delay: $endfield-kr-anim-delay;
+            .char-1 {
+                & > * {
+                    opacity: 0;
+                }
+                .t-l,
+                .t-l-inner {
+                    transform: translateY(-10px);
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.4s)
+                        #{$chr1-delay} steps(1) forwards,
+                        reset-transform-y
+                        applyPlaybackSpeed(0.7s)
+                        #{$chr1-delay} $forceful forwards;
+                }
+                .t-r {
+                    transform: translateX(-3px);
+                    animation:
+                        opacity_spawn
+                        applyPlaybackSpeed(0.4s)
+                        #{$chr1-delay} steps(1) forwards,
+                        reset-transform-x
+                        applyPlaybackSpeed(0.7s)
+                        #{$chr1-delay} $slow-down forwards;
+                }
+            }
+            $movement-1-anim-delay: calc(#{$chr1-delay} + 0.2s);
+            .movement-1 {
+                transform: translateX(-10px);
+                opacity: 0;
+                animation:
+                    opacity_spawn
+                    applyPlaybackSpeed(0.5s)
+                    #{$movement-1-anim-delay} steps(1) forwards,
+                    slide_LR
+                    applyPlaybackSpeed(0.8s)
+                    #{$movement-1-anim-delay} $forceful forwards;
+                .char-2 {
+                    transform: translateX(-6.34px);
+                    animation:
+                        reset-transform-x
+                        applyPlaybackSpeed(0.6s)
+                        calc(#{$movement-1-anim-delay} + 0.6s) $slow-down forwards;
+                }
+            }
+            .char-2 .t {
+                transform: translateX(-6.34px);
+                opacity: 0;
+                animation:
+                    opacity_spawn
+                    applyPlaybackSpeed(0.3s)
+                    calc(#{$movement-1-anim-delay} + 0.5s) steps(1) forwards,
+                    reset-transform-x
+                    applyPlaybackSpeed(0.6s)
+                    calc(#{$movement-1-anim-delay} + 0.5s) $slow-down forwards;
+            }
+            $chr3-delay: calc(#{applyPlaybackSpeed($movement-1-anim-delay)} + 0.1s);
+            .char-3 {
+                opacity: 0;
+                transform: translateY(-10px);
+                animation:
+                    opacity_spawn
+                    applyPlaybackSpeed(0.5s)
+                    #{$chr3-delay} steps(1) forwards,
+                    slide_UD
+                    applyPlaybackSpeed(0.8s)
+                    #{$chr3-delay} $forceful forwards;
+
+                $sub-delay: calc(#{$chr3-delay} + 0.73s + 0.05s * var(--order));
+                .t-r {
+                    transform: translateX(-3.5px);
+                    animation:
+                        reset-transform-x
+                        applyPlaybackSpeed(0.5s)
+                        #{$sub-delay} $slow-down forwards;
+                }
+                .b {
+                    transform: translateY(-1.6px);
+                    animation:
+                        reset-transform-y
+                        applyPlaybackSpeed(0.5s)
+                        #{$sub-delay} $slow-down forwards;
+                }
+            }
+            $chr4-delay: calc(#{$chr3-delay} + 0.2s);
+            .char-4 {
+                opacity: 0;
+                animation:
+                    opacity_spawn
+                    applyPlaybackSpeed(0.5s)
+                    #{$chr4-delay} steps(1) forwards;
+                .b, .t {
+                    $delay: calc(#{$chr4-delay} + 0.4s + 0.15s * var(--order));
+                    transform: translateX(-7px);
+                    animation:
+                        reset-transform-x
+                        applyPlaybackSpeed(0.5s)
+                        #{$delay} $slow-down forwards;
+                }
+            }
+            $chr5-delay: calc(#{$chr4-delay} + 0.7s);
+            .en {
+                #en-square {
+                    transform: translateX(-33px);
+                    animation:
+                        reset-transform-x
+                        applyPlaybackSpeed(0.7s)
+                        calc(#{$chr5-delay}) $slow-down forwards;
+                }
+                g {
+                    $delay: calc(#{$chr5-delay} + 0.1s * var(--order));
+                    transform: translateX(-10px);
+                    animation:
+                        reset-transform-x
+                        applyPlaybackSpeed(0.5s)
+                        #{$delay} $slow-down forwards;
+                }
+            }
+        }
+    }
+}
