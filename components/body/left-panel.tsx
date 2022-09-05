@@ -58,7 +58,7 @@ export const LeftPanel: FC<IIndex> = ({
     useEffect(() => {
         setIndexPolygon(indexMain);
         onIndexChange(indexMain);
-        indexMainController.set({ y: 830, x: -200 , transition: { duration: 1.2, ease: SlowDown }});
+        indexMainController.set({ y: 830, x: 200 , transition: { duration: 1.2, ease: SlowDown }});
         void indexMainController.start({ x: 0 });
         waitAsync(1000).then(
             () => {

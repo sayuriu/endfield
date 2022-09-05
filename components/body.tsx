@@ -13,6 +13,7 @@ import SpeedUp = AnimFunctions.SpeedUp;
 import { LeftPanel } from "@components/body/left-panel";
 import { RightPanel } from "@components/body/right-panel";
 import { MotionBox } from "@components/chakra-motion";
+import { Logger } from "@utils/logger";
 
 export const Body = () => {
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
@@ -23,7 +24,13 @@ export const Body = () => {
         if (to === currentPage) return;
         setCurrentPage(to);
     };
-    useEffect(() => { }, [currentLanguage]);
+    useEffect(() => {
+        const interval = setInterval(() => {});
+
+        return () => {
+            clearInterval(interval);
+        };
+    }, []);
     return (<MotionBox
         h="calc(100vh - 176px)"
         w="100vw"
@@ -31,7 +38,7 @@ export const Body = () => {
         className={joinClasses(bodyStyles["content"], "rel grid overflow-hidden")}
         layout
     >
-        <Slideshow interval={5000} imageURLs={["/img/05_HD.jpg"]}/>
+        <Slideshow/>
         <DesktopPanel
             LPanelOnIndexAnimStart={(from, to) => changePage(to)}
             LPanelIndexChange={setCurrentPage}
@@ -215,12 +222,9 @@ const DesktopPanel: FC<IDesktopPanelProps> = ({ LPanelOnIndexAnimStart, LPanelIn
             window.removeEventListener('resize', listener);
         };
     }, [isPortrait]);
-    // TODO
-    // noinspection PointlessBooleanExpressionJS
     return (
         <AnimatePresence>
             {isPortrait && <>
-            {/*{true && <>*/}
                 <LeftPanel onIndexChange={LPanelIndexChange} onIndexAnimStart={LPanelOnIndexAnimStart} initIndex={InitialIndex}/>
                 <RightPanel currentIndex={RPanelCurrentIndex}/>
             </>}
@@ -230,15 +234,14 @@ const DesktopPanel: FC<IDesktopPanelProps> = ({ LPanelOnIndexAnimStart, LPanelIn
 
 
 interface ISlideshowProps {
-    imageURLs: string[];
-    interval: number;
+    url?: string;
 }
 
-const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
-    const [imageData] = useAtom(ImageData);
+const Slideshow: FC<ISlideshowProps> = ({ url }) => {
     return (
         <AnimatePresence>
             <motion.div
+                key={""}
                 className={joinClasses(bodyStyles["preview-background"], "fh z0 overflow-hidden")}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -246,10 +249,9 @@ const Slideshow: FC<ISlideshowProps> = ({ interval, imageURLs }) => {
                 transition={{ duration: 0.5, ease: Forceful }}
             >
                 <Image
-                    src={imageData.get('assets/img/05_HD.jpg')!}
+                    src={"/img/05_HD.jpg"}
                     alt={""}
-                    quality={100}
-                    priority
+                    quality={"auto"}
                     layout={"fill"}
                     objectFit={"cover"}
                     style={{
