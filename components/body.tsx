@@ -21,7 +21,7 @@ export const Body = () => {
     const [imageData] = useAtom(ImageData);
     const imageArray = useMemo(() => [...imageData.entries()], []);
     const [currentPage, setCurrentPage] = useState(1);
-    const [currentImageURL, setCurrentImageURL] = useState("/img/05_HD.jpg");
+    const [currentImageURL, setCurrentImageURL] = useState("assets/img/05_HD.jpg");
     const changePage = (to: number) => {
         if (to === currentPage) return;
         setCurrentPage(to);
@@ -61,7 +61,7 @@ export const Body = () => {
         </AnimatePresence>
         <AnimatePresence>
             {currentPage === 3 && <>
-                <ImagePanel key={"imagePanel"} initialImageURL={currentImageURL.startsWith("blob") ? currentImageURL : imageData.get(`assets${currentImageURL}`)} onImageChange={(newImageURL) => setCurrentImageURL(() => newImageURL)}/>
+                <ImagePanel key={"imagePanel"} initialImageURL={currentImageURL.startsWith("blob") ? currentImageURL : imageData.get(currentImageURL)} onImageChange={(newImageURL) => setCurrentImageURL(() => newImageURL)}/>
                 <ImageDesc key={"imageDesc"} text={locale(`image-desc.${(currentImageURL.startsWith("blob") ? imageArray.find((v) => v[1] === currentImageURL)?.[0] : currentImageURL)?.split("/").pop()?.split(".")[0]}`)}/>
                 {/*<ImageCounter key={"imageCounter"} current={imageArray.findIndex((v) => v[1] === currentImageURL) + 1} total={imageArray.length}/>*/}
             </>}
