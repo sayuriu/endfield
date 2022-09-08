@@ -20,7 +20,7 @@ export const Body = () => {
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const [imageData] = useAtom(ImageData);
     const imageArray = useMemo(() => [...imageData.entries()], []);
-    const [currentPage, setCurrentPage] = useState(3);
+    const [currentPage, setCurrentPage] = useState(1);
     const [currentImageURL, setCurrentImageURL] = useState("/img/05_HD.jpg");
     const changePage = (to: number) => {
         if (to === currentPage) return;
