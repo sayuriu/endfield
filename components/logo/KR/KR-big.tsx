@@ -2,7 +2,7 @@ import { HasAnimation, joinClasses, joinModuleClasses, whichWider } from "@utils
 import {FC, useEffect, useRef, useState} from "react";
 import { motion } from "framer-motion";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 import styles from "./KR-big.module.scss";
 
 const moduleClasses = joinModuleClasses(styles);

@@ -3,8 +3,8 @@ import { AnimatePresence, motion, useAnimation } from "framer-motion";
 import { emptyFunc, joinClasses, waitAsync } from "@utils/common";
 import { AnimFunctions } from "@utils/anims";
 import bodyStyles from "@components/body/Body.module.scss";
-import Forceful = AnimFunctions.Forceful;
-import SlowDown = AnimFunctions.SlowDown;
+const { Forceful } = AnimFunctions;
+const { SlowDown } = AnimFunctions;
 
 interface IIndex {
     initIndex?: number;

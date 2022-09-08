@@ -4,7 +4,7 @@ import { LogoSmallProps } from "@components/logo/logo.types";
 import { motion } from "framer-motion";
 import styles from "@components/logo/JP/JP-small.module.scss";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 
 export const LogoSmall_JP: FC<HasAnimation & LogoSmallProps> = ({dontAnimateChild, opacity}) => {
     return (

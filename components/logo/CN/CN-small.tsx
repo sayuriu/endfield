@@ -2,7 +2,7 @@ import { FC } from "react";
 import {HasAnimation, joinClasses} from "@utils/common";
 import { motion } from "framer-motion";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 import styles from "./CN-small.module.scss";
 import { LogoSmallProps } from "@components/logo/logo.types";
 

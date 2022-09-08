@@ -3,7 +3,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import bodyStyles from "@components/body/Body.module.scss";
 import { joinClasses, waitAsync } from "@utils/common";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 
 export const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
     const [init, setInit] = useState(true);

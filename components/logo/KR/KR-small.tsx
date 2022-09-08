@@ -2,7 +2,7 @@ import { HasAnimation, joinClasses, joinModuleClasses, whichWider } from "@utils
 import { FC } from "react";
 import { motion } from "framer-motion";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 import styles from "./KR-small.module.scss";
 import { LogoSmallProps } from "@components/logo/logo.types";
 

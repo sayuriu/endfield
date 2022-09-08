@@ -3,6 +3,8 @@ type LogLevel = "info" | "warn" | "error" | "debug";
 interface LogOptions {
     bypassDevCheck?: boolean;
     trace?: boolean;
+    noVerbose?: boolean;
+    forceTrace?: boolean;
 }
 
 interface LogPayload {
@@ -53,8 +55,9 @@ export class Logger {
             case "debug": {
                 if (Logger.mode !== "development" && !options.bypassDevCheck)
                     return;
+                if (options.noVerbose) break;
                 grouped = true;
-                return;
+                break;
             }
             case "warn": {
                 if (Logger.mode === "development" || !options.bypassDevCheck)
@@ -69,6 +72,7 @@ export class Logger {
                 grouped = true;
             }
         }
+        if (options.forceTrace) trace = true;
         console
             [grouped ? "group" : "log"]
             (`${headerText}%c ${message.text}\n`, headerStyle, message.style, ...(grouped ? [] : data));

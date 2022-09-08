@@ -3,7 +3,7 @@ import {HasAnimation, joinClasses, whichWider} from "@utils/common";
 import { motion } from "framer-motion";
 import {FC, useEffect, useRef, useState} from "react";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 
 export const LogoLarge_EN: FC<HasAnimation> = ({ dontAnimateChild = null}) => {
     const mode = useRef("fh");

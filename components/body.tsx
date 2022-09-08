@@ -2,28 +2,31 @@ import Image from 'next/image';
 import { Box } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Language, ImageData, LanguagePack } from "@states/global";
-import { FC, useEffect, useState } from "react";
+import { FC, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 
 import bodyStyles from './body/Body.module.scss';
+import { Logger } from "@utils/logger";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
-import { joinClasses, useLocale } from "@utils/common";
-import SpeedUp = AnimFunctions.SpeedUp;
+import { joinClasses, Nullable, useLocale } from "@utils/common";
 import { LeftPanel } from "@components/body/left-panel";
 import { RightPanel } from "@components/body/right-panel";
-import { MotionBox } from "@components/chakra-motion";
-import { Logger } from "@utils/logger";
+import { MotionBox, MotionFlex } from "@components/chakra-motion";
+import { ImagePanel } from "@components/Images";
+
+const { Forceful, SpeedUp } = AnimFunctions;
 
 export const Body = () => {
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
-    const [currentLanguage] = useAtom(Language);
-    const [currentPage, setCurrentPage] = useState(1);
-
+    const [imageData] = useAtom(ImageData);
+    const imageArray = useMemo(() => [...imageData.entries()], []);
+    const [currentPage, setCurrentPage] = useState(3);
+    const [currentImageURL, setCurrentImageURL] = useState("/img/05_HD.jpg");
     const changePage = (to: number) => {
         if (to === currentPage) return;
         setCurrentPage(to);
     };
+
     useEffect(() => {
         const interval = setInterval(() => {});
 
@@ -38,7 +41,7 @@ export const Body = () => {
         className={joinClasses(bodyStyles["content"], "rel grid overflow-hidden")}
         layout
     >
-        <Slideshow/>
+        <Slideshow url={currentImageURL}/>
         <DesktopPanel
             LPanelOnIndexAnimStart={(from, to) => changePage(to)}
             LPanelIndexChange={setCurrentPage}
@@ -58,10 +61,122 @@ export const Body = () => {
         </AnimatePresence>
         <AnimatePresence>
             {currentPage === 3 && <>
-
+                <ImagePanel key={"imagePanel"} initialImageURL={currentImageURL.startsWith("blob") ? currentImageURL : imageData.get(`assets${currentImageURL}`)} onImageChange={(newImageURL) => setCurrentImageURL(() => newImageURL)}/>
+                <ImageDesc key={"imageDesc"} text={locale(`image-desc.${(currentImageURL.startsWith("blob") ? imageArray.find((v) => v[1] === currentImageURL)?.[0] : currentImageURL)?.split("/").pop()?.split(".")[0]}`)}/>
+                {/*<ImageCounter key={"imageCounter"} current={imageArray.findIndex((v) => v[1] === currentImageURL) + 1} total={imageArray.length}/>*/}
             </>}
         </AnimatePresence>
     </MotionBox>);
+};
+
+interface IImageCountProps {
+    current: number;
+}
+
+const ImageCounter: FC<IImageCountProps> = ({ current }) => {
+    const stringified = current.toString().padStart(2, "0");
+    return <MotionBox
+        className={"abs l0 b0 z4"}
+        fontFamily={"Orbitron"}
+        fontSize={"3.5rem"}
+        fontWeight={"bold"}
+        initial={{
+            y: 80
+        }}
+        animate={{
+            y: 0
+        }}
+        exit={{
+            y: 80
+        }}
+        transition={{
+            duration: 0.7,
+            delay: 0.15,
+            ease: AnimFunctions.Forceful,
+        }}
+    >
+        <span>{stringified[0]}</span>
+        <span>{stringified[1]}</span>
+    </MotionBox>;
+};
+
+interface IImageDescProps {
+    text: string;
+}
+
+const ImageDesc: FC<IImageDescProps> = ({ text }) => {
+    const [isExiting, setIsExiting] = useState(false);
+    useEffect(() => setIsExiting(true), []);
+    return <MotionFlex
+        fontFamily={"Oswald"}
+        fontSize={"18px"}
+        bg={"#FDFD1F"}
+        className={"abs b0 z3 a-flex-center"}
+        initial={{
+            y: 80
+        }}
+        animate={{
+            y: 0
+        }}
+        exit={{
+            y: 80
+        }}
+        transition={{
+            duration: 0.7,
+            delay: 0.15,
+            ease: AnimFunctions.Forceful,
+            y: {
+                duration: isExiting ? 1.2 : 0.7,
+                delay: isExiting ? 0.1 : 1,
+                ease: isExiting ? AnimFunctions.Forceful : AnimFunctions.SlowDown,
+            },
+        }}
+        left={"calc((100vh - 176px) / (438 / 154.29))"}
+        maxW={"calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"}
+        layout={"size"}
+    >
+        <MotionBox
+            p={"10px 20px"}
+            initial={{
+                y: 80
+            }}
+            animate={{
+                y: 0
+            }}
+            exit={{
+                y: 80
+            }}
+            transition={{
+                duration: 0.5,
+                ease: AnimFunctions.Forceful,
+                y: {
+                    duration: isExiting ? 1.2 : 0.7,
+                    delay: isExiting ? 0 : 0.7,
+                    ease: isExiting ? AnimFunctions.Forceful : AnimFunctions.SlowDown,
+                },
+            }}
+            bg={"#000"}
+            layout={"size"}
+            overflow={"hidden"}
+        >
+            <MotionBox
+                as={"p"}
+                color={"#fff"}
+                layout={"position"}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{
+                    y: {
+                        duration: 0.7,
+                        delay: 0.2,
+                        ease: AnimFunctions.SlowDown,
+                    }
+                }}
+            >
+                {text}
+            </MotionBox>
+        </MotionBox>
+    </MotionFlex>;
 };
 
 const DescriptionToggleBtn: FC<{ onClick: (active: boolean) => void, initial: boolean }> = ({ onClick, initial }) => {
@@ -241,7 +356,7 @@ const Slideshow: FC<ISlideshowProps> = ({ url }) => {
     return (
         <AnimatePresence>
             <motion.div
-                key={""}
+                key={url}
                 className={joinClasses(bodyStyles["preview-background"], "fh z0 overflow-hidden")}
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
@@ -249,7 +364,7 @@ const Slideshow: FC<ISlideshowProps> = ({ url }) => {
                 transition={{ duration: 0.5, ease: Forceful }}
             >
                 <Image
-                    src={"/img/05_HD.jpg"}
+                    src={url!}
                     alt={""}
                     quality={"auto"}
                     layout={"fill"}

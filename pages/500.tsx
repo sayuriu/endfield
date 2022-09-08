@@ -4,7 +4,7 @@ import { useEffect } from "react";
 export default function _500() {
     const router = useRouter();
     useEffect(() => {
-        router.prefetch("/");
-        router.push("/");
+        void router.prefetch("/");
+        void router.push("/");
     });
 }

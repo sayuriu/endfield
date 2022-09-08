@@ -1,7 +1,7 @@
 import { motion } from "framer-motion";
 import { FC, useEffect, useState } from "react";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 import { OverridableStyle } from "@utils/common";
 
 interface ICheckbox {

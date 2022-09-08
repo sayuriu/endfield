@@ -2,7 +2,7 @@ import {HasAnimation, joinClasses, whichWider} from "@utils/common";
 import {FC, useEffect, useRef, useState} from "react";
 import { motion } from "framer-motion";
 import { AnimFunctions } from "@utils/anims";
-import Forceful = AnimFunctions.Forceful;
+const { Forceful } = AnimFunctions;
 import styles from "./CN-big.v2.module.scss";
 
 export const LogoLarge_CN: FC<HasAnimation> = ({dontAnimateChild}) => {
