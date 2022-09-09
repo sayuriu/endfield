@@ -14,14 +14,14 @@ import { RightPanel } from "@components/body/right-panel";
 import { MotionBox, MotionFlex } from "@components/chakra-motion";
 import { ImagePanel } from "@components/Images";
 
-const { Forceful, SpeedUp } = AnimFunctions;
+const { Forceful, SpeedUp, SlowDown } = AnimFunctions;
 
 export const Body = () => {
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const [imageData] = useAtom(ImageData);
     const imageArray = useMemo(() => [...imageData.entries()], []);
     const [currentPage, setCurrentPage] = useState(1);
-    const [currentImageURL, setCurrentImageURL] = useState("assets/img/05_HD.jpg");
+    const [currentImageURL, setCurrentImageURL] = useState("/assets/img/05_HD.jpg");
     const changePage = (to: number) => {
         if (to === currentPage) return;
         setCurrentPage(to);
@@ -92,7 +92,7 @@ const ImageCounter: FC<IImageCountProps> = ({ current }) => {
         transition={{
             duration: 0.7,
             delay: 0.15,
-            ease: AnimFunctions.Forceful,
+            ease: Forceful,
         }}
     >
         <span>{stringified[0]}</span>
@@ -102,11 +102,20 @@ const ImageCounter: FC<IImageCountProps> = ({ current }) => {
 
 interface IImageDescProps {
     text: string;
+    onZoomClicked?: () => void;
 }
 
-const ImageDesc: FC<IImageDescProps> = ({ text }) => {
+const ImageDesc: FC<IImageDescProps> = ({ text , onZoomClicked }) => {
     const [isExiting, setIsExiting] = useState(false);
-    useEffect(() => setIsExiting(true), []);
+    const [prevText, setPrevText] = useState<Nullable<string>>(text);
+    const [isZoomButtonHovered, setIsZoomButtonHovered] = useState(false);
+    useEffect(() => {
+        let timeout = setTimeout(() => setPrevText(() => text), 500);
+        return () => {
+            clearTimeout(timeout);
+            setIsExiting(true);
+        };
+    }, [text]);
     return <MotionFlex
         fontFamily={"Oswald"}
         fontSize={"18px"}
@@ -123,20 +132,20 @@ const ImageDesc: FC<IImageDescProps> = ({ text }) => {
         }}
         transition={{
             duration: 0.7,
-            delay: 0.15,
-            ease: AnimFunctions.Forceful,
+            ease: SlowDown,
             y: {
                 duration: isExiting ? 1.2 : 0.7,
                 delay: isExiting ? 0.1 : 1,
-                ease: isExiting ? AnimFunctions.Forceful : AnimFunctions.SlowDown,
+                ease: isExiting ? Forceful : SlowDown,
             },
         }}
         left={"calc((100vh - 176px) / (438 / 154.29))"}
         maxW={"calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"}
-        layout={"size"}
+        layout
     >
         <MotionBox
             p={"10px 20px"}
+            className={"rel"}
             initial={{
                 y: 80
             }}
@@ -148,29 +157,101 @@ const ImageDesc: FC<IImageDescProps> = ({ text }) => {
             }}
             transition={{
                 duration: 0.5,
-                ease: AnimFunctions.Forceful,
+                // delay: prevText?.length ?? 0 > text.length ? 0.2 : 0,
+                ease: Forceful,
                 y: {
                     duration: isExiting ? 1.2 : 0.7,
                     delay: isExiting ? 0 : 0.7,
-                    ease: isExiting ? AnimFunctions.Forceful : AnimFunctions.SlowDown,
+                    ease: isExiting ? Forceful : SlowDown,
                 },
             }}
             bg={"#000"}
-            layout={"size"}
-            overflow={"hidden"}
+            layout
         >
+            <MotionBox
+                className={"abs l0 bfull z3 overflow-hidden"}
+                initial={{
+                    height: 100,
+                }}
+                animate={{
+                    width: 100,
+                    background: "linear-gradient(90deg, hsla(0deg, 100%, 0%, 1) 20%, hsla(0deg, 100%, 100%, 0) 100%)",
+                }}
+                as={"button"}
+                layout={"position"}
+                transition={{
+                    duration: 1,
+                    ease: Forceful
+                }}
+                whileHover={{
+                    width: 120,
+                    background: "linear-gradient(90deg, hsla(0deg, 100%, 0%, 1) 100%, hsla(0deg, 100%, 100%, 0) 100%)",
+                    transition: {
+                        duration: .7,
+                        ease: SlowDown
+                    }
+                }}
+                onHoverStart={() => setIsZoomButtonHovered(true)}
+                onHoverEnd={() => setIsZoomButtonHovered(false)}
+                onClick={onZoomClicked}
+            >
+                <MotionBox fontSize={"3rem"} textOverflow={"nowrap"}>
+                    ZOOM
+                </MotionBox>
+            </MotionBox>
+            <AnimatePresence>
+                <MotionBox
+                    key={`text-desc-${text[0]}-${text.length}`}
+                    className={"abs"}
+                    as={"p"}
+                    color={"#fff"}
+                    layout={"position"}
+                    initial={{
+                        opacity: 0,
+                        y: 20,
+                    }}
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                        transition: {
+                            delay: 0.2,
+                            duration: 0.5,
+                            ease: SlowDown,
+                            y: {
+                                duration: 0.7,
+                                delay: 0.2,
+                                ease: SlowDown,
+                            }
+                        }
+                    }}
+                    exit={{
+                        opacity: 0,
+                        y: -20,
+                        transition: {
+                            duration: 0.5,
+                            delay: 0,
+                            ease: SlowDown,
+                        }
+                    }}
+                >
+                    {text}
+                </MotionBox>
+            </AnimatePresence>
             <MotionBox
                 as={"p"}
                 color={"#fff"}
-                layout={"position"}
+                layout
                 initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
+                animate={{ y: 0 }}
                 transition={{
+                    delay: prevText?.length ?? 0 < text.length ? 0.2 : 0.5,
+                    ease: Forceful,
+                    duration: 1,
                     y: {
                         duration: 0.7,
                         delay: 0.2,
-                        ease: AnimFunctions.SlowDown,
-                    }
+                        ease: SlowDown,
+                    },
                 }}
             >
                 {text}

@@ -142,6 +142,7 @@ export const LeftPanel: FC<IIndex> = ({
             viewBox="0 29 520 880"
             fill="none"
             xmlns="http://www.w3.org/2000/svg"
+            pointerEvents={"none"}
         >
             <motion.path
                 filter="url(#filter0_bd_140_3)"
@@ -153,6 +154,7 @@ export const LeftPanel: FC<IIndex> = ({
             <motion.path
                 filter="url(#filter0_d_116_13)"
                 onWheel={(e) => HandleScroll(e as unknown as WheelEvent)}
+                pointerEvents={"all"}
                 fill="black"
                 variants={InnerPolygonVariants}
                 {...commonPolygonProps}

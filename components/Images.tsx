@@ -23,9 +23,9 @@ export const ImagePanel: FC<IImageGalleryProps> = ({ initialImageURL, onImageCha
     let hasPredeterminedImage = false;
     const [currentImageIndex, setCurrentImageIndex] = useState<Nullable<number>>((() => {
         if (!initialImageURL) return null;
-        const target = imageArray.indexOf(initialImageURL);
-        if (target !== -1) hasPredeterminedImage = true;
-        return target === -1 ? null : target;
+        const target = imageArray.find(v => initialImageURL.endsWith(v) || v.endsWith(initialImageURL));
+        if (target !== undefined) hasPredeterminedImage = true;
+        return target === undefined ? null : imageArray.indexOf(target);
     })());
 
     const [preInit, setPreInit] = useState(hasPredeterminedImage); // ONCE
@@ -45,10 +45,9 @@ export const ImagePanel: FC<IImageGalleryProps> = ({ initialImageURL, onImageCha
         return setIsExiting(true);
     }, []);
     return <MotionFlex
-        className={"fh fw abs t0 r0 z2 flex-col"}
+        className={"fh abs t0 r0 z2 flex-col"}
         isolation={"isolate"}
         w={"clamp(100px, 20vw, 270px)"}
-        bg={"red"}
         initial={{ x: "calc(100% + 10px)" }}
         exit={{ x: "calc(100% + 10px)" }}
         animate={{ x: 0 }}
@@ -110,6 +109,7 @@ export const Image2: FC<ImageProps & IImage2Props> = ({
     };
     return <MotionBox
         className={joinClasses("fw rel")}
+        cursor={isCurrent ? "normal" : "pointer"}
         animate={{
             height: 1,
             flexGrow: isCurrent ? 1.8 : (isHovered ? 1.5 : 1),
@@ -127,7 +127,7 @@ export const Image2: FC<ImageProps & IImage2Props> = ({
             className={"fw fh"}
             style={{
                 transition: `all 0.5s cubic-bezier(${SlowDown.toString()})`,
-                filter: isCurrent ? "brightness(1.2)" : (isHovered ? "brightness(.9)" : "brightness(.7)"),
+                filter: isCurrent ? "brightness(1.2) sepia(0)" : (isHovered ? "brightness(.9) sepia(.3)" : "brightness(.7) sepia(.9)"),
             }}
             layout={"fill"}
             objectFit="cover"
