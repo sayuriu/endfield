@@ -2,8 +2,8 @@ import Image from 'next/image';
 import { Box } from "@chakra-ui/react";
 import { useAtom } from "jotai";
 import { Language, ImageData, LanguagePack } from "@states/global";
-import { FC, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion } from "framer-motion";
+import { FC, ReactNode, useEffect, useMemo, useState } from "react";
+import { AnimatePresence, motion, usePresence } from "framer-motion";
 
 import bodyStyles from './body/Body.module.scss';
 import { Logger } from "@utils/logger";
@@ -11,17 +11,16 @@ import { AnimFunctions } from "@utils/anims";
 import { joinClasses, Nullable, useLocale } from "@utils/common";
 import { LeftPanel } from "@components/body/left-panel";
 import { RightPanel } from "@components/body/right-panel";
-import { MotionBox, MotionFlex } from "@components/chakra-motion";
-import { ImagePanel } from "@components/Images";
+import { MotionBox } from "@components/motion";
+// import { ImageDesc, ImageGallery, ImagePanel } from "@components/Images";
+import { ImageGallery } from "@components/images2";
 
 const { Forceful, SpeedUp, SlowDown } = AnimFunctions;
 
 export const Body = () => {
+    // const [imageData] = useAtom(ImageData);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
-    const [imageData] = useAtom(ImageData);
-    const imageArray = useMemo(() => [...imageData.entries()], []);
-    const [currentPage, setCurrentPage] = useState(1);
-    const [currentImageURL, setCurrentImageURL] = useState("/assets/img/05_HD.jpg");
+    const [currentPage, setCurrentPage] = useState(3);
     const changePage = (to: number) => {
         if (to === currentPage) return;
         setCurrentPage(to);
@@ -41,7 +40,6 @@ export const Body = () => {
         className={joinClasses(bodyStyles["content"], "rel grid overflow-hidden")}
         layout
     >
-        <Slideshow url={currentImageURL}/>
         <DesktopPanel
             LPanelOnIndexAnimStart={(from, to) => changePage(to)}
             LPanelIndexChange={setCurrentPage}
@@ -59,205 +57,9 @@ export const Body = () => {
                 <SectionTitle text={"RFPD"}/>
             </>}
         </AnimatePresence>
-        <AnimatePresence>
-            {currentPage === 3 && <>
-                <ImagePanel key={"imagePanel"} initialImageURL={currentImageURL.startsWith("blob") ? currentImageURL : imageData.get(currentImageURL)} onImageChange={(newImageURL) => setCurrentImageURL(() => newImageURL)}/>
-                <ImageDesc key={"imageDesc"} text={locale(`image-desc.${(currentImageURL.startsWith("blob") ? imageArray.find((v) => v[1] === currentImageURL)?.[0] : currentImageURL)?.split("/").pop()?.split(".")[0]}`)}/>
-                {/*<ImageCounter key={"imageCounter"} current={imageArray.findIndex((v) => v[1] === currentImageURL) + 1} total={imageArray.length}/>*/}
-            </>}
-        </AnimatePresence>
+        {/*<ImageGallery initialImageURL={imageData.get("assets/img/bg.jpg")!} present={currentPage === 3}/>*/}
+        <ImageGallery currentPage={currentPage}/>
     </MotionBox>);
-};
-
-interface IImageCountProps {
-    current: number;
-}
-
-const ImageCounter: FC<IImageCountProps> = ({ current }) => {
-    const stringified = current.toString().padStart(2, "0");
-    return <MotionBox
-        className={"abs l0 b0 z4"}
-        fontFamily={"Orbitron"}
-        fontSize={"3.5rem"}
-        fontWeight={"bold"}
-        initial={{
-            y: 80
-        }}
-        animate={{
-            y: 0
-        }}
-        exit={{
-            y: 80
-        }}
-        transition={{
-            duration: 0.7,
-            delay: 0.15,
-            ease: Forceful,
-        }}
-    >
-        <span>{stringified[0]}</span>
-        <span>{stringified[1]}</span>
-    </MotionBox>;
-};
-
-interface IImageDescProps {
-    text: string;
-    onZoomClicked?: () => void;
-}
-
-const ImageDesc: FC<IImageDescProps> = ({ text , onZoomClicked }) => {
-    const [isExiting, setIsExiting] = useState(false);
-    const [prevText, setPrevText] = useState<Nullable<string>>(text);
-    const [isZoomButtonHovered, setIsZoomButtonHovered] = useState(false);
-    useEffect(() => {
-        let timeout = setTimeout(() => setPrevText(() => text), 500);
-        return () => {
-            clearTimeout(timeout);
-            setIsExiting(true);
-        };
-    }, [text]);
-    return <MotionFlex
-        fontFamily={"Oswald"}
-        fontSize={"18px"}
-        bg={"#FDFD1F"}
-        className={"abs b0 z3 a-flex-center"}
-        initial={{
-            y: 80
-        }}
-        animate={{
-            y: 0
-        }}
-        exit={{
-            y: 80
-        }}
-        transition={{
-            duration: 0.7,
-            ease: SlowDown,
-            y: {
-                duration: isExiting ? 1.2 : 0.7,
-                delay: isExiting ? 0.1 : 1,
-                ease: isExiting ? Forceful : SlowDown,
-            },
-        }}
-        left={"calc((100vh - 176px) / (438 / 154.29))"}
-        maxW={"calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"}
-        layout
-    >
-        <MotionBox
-            p={"10px 20px"}
-            className={"rel"}
-            initial={{
-                y: 80
-            }}
-            animate={{
-                y: 0
-            }}
-            exit={{
-                y: 80
-            }}
-            transition={{
-                duration: 0.5,
-                // delay: prevText?.length ?? 0 > text.length ? 0.2 : 0,
-                ease: Forceful,
-                y: {
-                    duration: isExiting ? 1.2 : 0.7,
-                    delay: isExiting ? 0 : 0.7,
-                    ease: isExiting ? Forceful : SlowDown,
-                },
-            }}
-            bg={"#000"}
-            layout
-        >
-            <MotionBox
-                className={"abs l0 bfull z3 overflow-hidden"}
-                initial={{
-                    height: 100,
-                }}
-                animate={{
-                    width: 100,
-                    background: "linear-gradient(90deg, hsla(0deg, 100%, 0%, 1) 20%, hsla(0deg, 100%, 100%, 0) 100%)",
-                }}
-                as={"button"}
-                layout={"position"}
-                transition={{
-                    duration: 1,
-                    ease: Forceful
-                }}
-                whileHover={{
-                    width: 120,
-                    background: "linear-gradient(90deg, hsla(0deg, 100%, 0%, 1) 100%, hsla(0deg, 100%, 100%, 0) 100%)",
-                    transition: {
-                        duration: .7,
-                        ease: SlowDown
-                    }
-                }}
-                onHoverStart={() => setIsZoomButtonHovered(true)}
-                onHoverEnd={() => setIsZoomButtonHovered(false)}
-                onClick={onZoomClicked}
-            >
-                <MotionBox fontSize={"3rem"} textOverflow={"nowrap"}>
-                    ZOOM
-                </MotionBox>
-            </MotionBox>
-            <AnimatePresence>
-                <MotionBox
-                    key={`text-desc-${text[0]}-${text.length}`}
-                    className={"abs"}
-                    as={"p"}
-                    color={"#fff"}
-                    layout={"position"}
-                    initial={{
-                        opacity: 0,
-                        y: 20,
-                    }}
-                    animate={{
-                        opacity: 1,
-                        y: 0,
-                        transition: {
-                            delay: 0.2,
-                            duration: 0.5,
-                            ease: SlowDown,
-                            y: {
-                                duration: 0.7,
-                                delay: 0.2,
-                                ease: SlowDown,
-                            }
-                        }
-                    }}
-                    exit={{
-                        opacity: 0,
-                        y: -20,
-                        transition: {
-                            duration: 0.5,
-                            delay: 0,
-                            ease: SlowDown,
-                        }
-                    }}
-                >
-                    {text}
-                </MotionBox>
-            </AnimatePresence>
-            <MotionBox
-                as={"p"}
-                color={"#fff"}
-                layout
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ y: 0 }}
-                transition={{
-                    delay: prevText?.length ?? 0 < text.length ? 0.2 : 0.5,
-                    ease: Forceful,
-                    duration: 1,
-                    y: {
-                        duration: 0.7,
-                        delay: 0.2,
-                        ease: SlowDown,
-                    },
-                }}
-            >
-                {text}
-            </MotionBox>
-        </MotionBox>
-    </MotionFlex>;
 };
 
 const DescriptionToggleBtn: FC<{ onClick: (active: boolean) => void, initial: boolean }> = ({ onClick, initial }) => {
@@ -429,35 +231,6 @@ const DesktopPanel: FC<IDesktopPanelProps> = ({ LPanelOnIndexAnimStart, LPanelIn
 };
 
 
-interface ISlideshowProps {
-    url?: string;
-}
-
-const Slideshow: FC<ISlideshowProps> = ({ url }) => {
-    return (
-        <AnimatePresence>
-            <motion.div
-                key={url}
-                className={joinClasses(bodyStyles["preview-background"], "fh z0 overflow-hidden")}
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.5, ease: Forceful }}
-            >
-                <Image
-                    src={url!}
-                    alt={""}
-                    quality={"auto"}
-                    layout={"fill"}
-                    objectFit={"cover"}
-                    style={{
-                        scale: 1
-                    }}
-                />
-            </motion.div>
-        </AnimatePresence>
-    );
-};
 
 const OverviewScreen = () => {
     return (

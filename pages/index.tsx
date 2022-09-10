@@ -16,7 +16,7 @@ import { LogoLarge_EN } from "@components/logo/EN/EN-big";
 import { LogoLarge_CN } from "@components/logo/CN/CN-big.v2";
 import { LogoLarge_JP } from "@components/logo/JP/JP-big";
 import { LogoLarge_KR } from "@components/logo/KR/KR-big";
-import { MotionBox, MotionFlex } from '@components/chakra-motion';
+import { MotionBox, MotionFlex } from '@components/motion';
 
 interface PageProps {
     lang: string,
@@ -64,9 +64,19 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro, langPack }) => {
     const locale = useLocale(useAtom(Language)[0], initalLangPack);
 
     const loadDependencies = [
-        ...new Array(8)
-            .fill(0)
-            .map((_, i) => ({ url: `assets/img/0${i + 1}_HD.jpg`, overrideOptions: { mimeType: 'image/jpeg' } })),
+        ...[
+            ...new Array(8)
+                .fill(0)
+                .map((_, i) => `0${i + 1}_HD`),
+            ...[
+                "bg",
+                "world_bg",
+                "department_bg",
+            ]
+        ].map((i) => ({
+            url: `assets/img/${i}.jpg`,
+            overrideOptions: { mimeType: 'image/jpeg' }
+        })),
         ...AvailableLanguages
             .filter(l => l !== lang)
             .map(l => ({ url: `assets/lang/${l}.json`, overrideOptions: { responseType: 'json', mimeType: 'application/json' } })),

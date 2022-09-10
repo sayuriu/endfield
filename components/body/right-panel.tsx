@@ -26,7 +26,7 @@ export const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
             fillOpacity: 0.47,
         },
         2: {
-            d: "M94,0H800V907H340Z",
+            d: "M40,0H800V907H380Z",
             fillOpacity: 0.47,
         },
         3: {
@@ -44,7 +44,7 @@ export const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
             fillOpacity: 0.5,
         },
         2: {
-            d: "M144,0H800V907H390Z",
+            d: "M90,0H800V907H430Z",
             fillOpacity: 0.5,
         },
         3: {

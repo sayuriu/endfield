@@ -1,4 +1,4 @@
-import { motion } from "framer-motion";
+import { motion, MotionProps } from "framer-motion";
 import { FC, ReactNode, useEffect, useState } from "react";
 import { AnimFunctions } from "@utils/anims";
 
@@ -26,12 +26,20 @@ export const Anchor: FC<AnchorProps> = ({
         initial={{
             textDecoration: "underline dotted",
             textUnderlineOffset: "1em",
+            y: 20,
+            opacity: 0,
         }}
         animate={{
             color: "hsl(231, 0%, 90%)",
             textDecoration: "underline dotted",
             textUnderlineOffset: isHovered ? "-1.1em" : "0.1em",
             textDecorationColor: "hsl(231, 0%, 65%)",
+            y: 0,
+            opacity: 1,
+        }}
+        exit={{
+            y: -20,
+            opacity: 0,
         }}
         transition={{
             textUnderlineOffset: {
@@ -41,6 +49,14 @@ export const Anchor: FC<AnchorProps> = ({
             },
             duration: 0.3,
             ease: Forceful,
+            y: {
+                duration: 0.5,
+                ease: Forceful,
+            },
+            opacity: {
+                duration: 0.5,
+                ease: Forceful,
+            }
         }}
         className={"rel cur-pointer"}
         href={to}

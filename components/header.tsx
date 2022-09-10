@@ -7,7 +7,7 @@ import { AnimatePresence, motion } from "framer-motion";
 import { AvailableLanguages, Language, LanguagePack } from "@states/global";
 import { localGet, localSet, Nullable, OverridableStyle, useLocale } from "@utils/common";
 import { AnimFunctions } from "@utils/anims";
-import { MotionBox } from "./chakra-motion";
+import { MotionBox } from "./motion";
 import { LogoSmall_CN } from "@components/logo/CN/CN-small";
 import { LogoSmall_EN } from "@components/logo/EN/EN-small";
 import { LogoSmall_JP } from "@components/logo/JP/JP-small";

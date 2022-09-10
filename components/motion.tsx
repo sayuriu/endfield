@@ -16,7 +16,7 @@ import {
     TextProps
 } from '@chakra-ui/react';
 import NextImage, { ImageProps as NextImageProps } from 'next/image';
-
+import { SVGProps } from 'react';
 export const MotionBox = motion<
     Omit<BoxProps, keyof MotionProps> & MotionProps
     >(Box as any);
