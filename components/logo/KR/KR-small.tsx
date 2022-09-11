@@ -1,8 +1,7 @@
-import { HasAnimation, joinClasses, joinModuleClasses, whichWider } from "@utils/common";
+import { HasAnimation, joinClasses, joinModuleClasses } from "@utils/common";
 import { FC } from "react";
 import { motion } from "framer-motion";
-import { AnimFunctions } from "@utils/anims";
-const { Forceful } = AnimFunctions;
+import { Forceful } from "@utils/anims";
 import styles from "./KR-small.module.scss";
 import { LogoSmallProps } from "@components/logo/logo.types";
 

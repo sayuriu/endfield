@@ -2,8 +2,7 @@ import styles from "@root/components/logo/EN/EN-big.module.scss";
 import {HasAnimation, joinClasses, whichWider} from "@utils/common";
 import { motion } from "framer-motion";
 import {FC, useEffect, useRef, useState} from "react";
-import { AnimFunctions } from "@utils/anims";
-const { Forceful } = AnimFunctions;
+import { Forceful } from "@utils/anims";
 
 export const LogoLarge_EN: FC<HasAnimation> = ({ dontAnimateChild = null}) => {
     const mode = useRef("fh");

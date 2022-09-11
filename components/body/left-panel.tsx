@@ -1,10 +1,8 @@
 import { FC, useEffect, useState } from "react";
-import { AnimatePresence, motion, useAnimation } from "framer-motion";
+import { AnimatePresence, motion, useAnimation, usePresence } from "framer-motion";
 import { emptyFunc, joinClasses, waitAsync } from "@utils/common";
-import { AnimFunctions } from "@utils/anims";
+import { Forceful, SlowDown } from "@utils/anims";
 import bodyStyles from "@components/body/Body.module.scss";
-const { Forceful } = AnimFunctions;
-const { SlowDown } = AnimFunctions;
 
 interface IIndex {
     initIndex?: number;
@@ -18,6 +16,7 @@ export const LeftPanel: FC<IIndex> = ({
    onIndexChange= emptyFunc,
    initIndex = 1
 }) => {
+    const [isPresent, safeToRemove] = usePresence();
     const [init, setInit] = useState(true);
     const [indexSubU, setIndexSubU] = useState(initIndex - 1);
     const [indexMain, setIndexMain] = useState(initIndex);
@@ -73,7 +72,7 @@ export const LeftPanel: FC<IIndex> = ({
             indexSubLController.stop();
             indexSubUController.stop();
         };
-    }, []);
+    }, [isPresent]);
 
     const indexTextConfig = {
         fontFamily: "Jetbrains Mono",

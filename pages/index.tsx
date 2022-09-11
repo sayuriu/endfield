@@ -5,7 +5,7 @@ import { useEffect, useState } from 'react';
 import { AnimatePresence } from "framer-motion";
 import { Box } from "@chakra-ui/react";
 
-import { AvailableLanguages, ImageData, Language, LanguagePack } from "@states/global";
+import { AvailableLanguages, ImageData, IsPortrait, Language, LanguagePack } from "@states/global";
 import { AssetLoader } from "@utils/loader";
 import { findNearestMultiple, LanguagePack as _LanguagePack, localGet, localSet, Nullable, useLocale, waitAsync } from "@utils/common";
 import { Footer } from "@components/footer";
@@ -101,9 +101,9 @@ const Home: NextPage<PageProps> = ({ lang, fullIntro, langPack }) => {
                 pathname: '/',
                 query: {
                     fullIntro: 'true',
-                    lang
                 }
             });
+        console.log(lang);
         let animateLogo = true;
         if (fullIntro === 'true' || (fullIntro === null && localGet('fullIntro') === 'true'))
             document.body.style.setProperty('--anim-playback-rate', getIntroAnimSpeed(lang ?? '').toString());

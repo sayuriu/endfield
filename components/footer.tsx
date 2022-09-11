@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from "react";
 import { Box } from "@chakra-ui/react";
 import { motion, useAnimation } from "framer-motion";
-import { AnimFunctions } from "@utils/anims";
+import { Forceful, SlowDown } from "@utils/anims";
 import { joinClasses, useLocale } from "@utils/common";
 import { HypergryphLogo } from "@components/logo/Hypergryph/Hypergryph";
 import { MountainContourLogo } from "@components/logo/MountainContour/MountainContour";
@@ -10,7 +10,6 @@ import { Anchor } from "@components/anchor";
 import terrainStyles from "./terrain.module.scss";
 import { Language, LanguagePack } from "@states/global";
 import { useAtom } from "jotai";
-const { Forceful, SlowDown } = AnimFunctions;
 
 export const Footer:  FC = () => {
     const LogoAnimConfig = (delay = 0) => ({

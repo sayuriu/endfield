@@ -27,11 +27,18 @@ export const LanguagePack = atom<_LanguagePack, Partial<_LanguagePack>, void>(
     }
 );
 
-
 const ImageDataAtom = atom<Map<string, string>>(new Map());
 export const ImageData = atom<Map<string, string>, Map<string, string>, void>(
     (get) => get(ImageDataAtom),
     (get, set, newData) => {
         set(ImageDataAtom, newData);
+    }
+);
+
+const IsPortraitAtom = atom(false);
+export const IsPortrait = atom<boolean, boolean, void>(
+    (get) => get(IsPortraitAtom),
+    (get, set, isPortrait) => {
+        set(IsPortraitAtom, isPortrait);
     }
 );

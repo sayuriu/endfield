@@ -2,8 +2,7 @@ import { FC, useEffect, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import bodyStyles from "@components/body/Body.module.scss";
 import { joinClasses, waitAsync } from "@utils/common";
-import { AnimFunctions } from "@utils/anims";
-const { Forceful } = AnimFunctions;
+import { Forceful } from "@utils/anims";
 
 export const RightPanel: FC<{ currentIndex: number }> = ({ currentIndex }) => {
     const [init, setInit] = useState(true);

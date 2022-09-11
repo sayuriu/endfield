@@ -3,8 +3,7 @@ import { HasAnimation, joinClasses, whichWider } from "@utils/common";
 import { motion } from "framer-motion";
 
 import styles from "./JP-big.module.scss";
-import { AnimFunctions } from "@utils/anims";
-const { Forceful } = AnimFunctions;
+import { Forceful } from "@utils/anims";
 
 export const LogoLarge_JP: FC<HasAnimation> = ({ dontAnimateChild = null}) => {
     const mode = useRef("fh");

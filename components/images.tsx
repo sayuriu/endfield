@@ -1,16 +1,18 @@
 import { FC, ReactNode, useCallback, useEffect, useMemo, useState } from "react";
 import { AnimatePresence, motion, MotionProps, useAnimation, usePresence } from "framer-motion";
 import { joinClasses, Nullable, useLocale, waitAsync } from "@utils/common";
-import { useAtom } from "jotai";
+import { atom, useAtom } from "jotai";
 import { ImageData, Language, LanguagePack } from "@states/global";
 import bodyStyles from "@components/body/Body.module.scss";
 import Image, { ImageProps } from "next/image";
-import { AnimFunctions } from "@utils/anims";
+import { SlowDown, Forceful } from "@utils/anims";
 import { Logger } from "@utils/logger";
 import { MotionBox, MotionFlex } from "@components/motion";
 import { Box, Flex } from "@chakra-ui/react";
 
-const { SlowDown, Forceful } = AnimFunctions;
+const ImageIndex = atom(2);
+export const ImageGalleryInit = atom(true);
+const InZoomMode = atom(false);
 
 interface IImageGalleryProps {
     currentPage: number;
@@ -18,13 +20,12 @@ interface IImageGalleryProps {
 }
 export const ImageGallery: FC<IImageGalleryProps> = ({ currentPage, unfocused = false }) => {
     const [imageData] = useAtom(ImageData);
-    const [isZoomed, setIsZoomed] = useState(false);
+    const [inZoomMode] = useAtom(InZoomMode);
     const imageArray = useMemo(() => [...imageData.entries()].filter(v => !v[0].match(/(department|world)/g)), []);
 
-    const [currentImageIndex, setCurrentImageIndex] = useState(2);
+    const [currentImageIndex] = useAtom(ImageIndex);
     const [currentImageURL, setCurrentImageURL] = useState(imageData.get("assets/img/bg.jpg"));
     useEffect(() => {
-        // if (!lockImage)
         switch (currentPage) {
             case 1:
                 setCurrentImageURL(imageData.get("assets/img/world_bg.jpg"));
@@ -35,17 +36,17 @@ export const ImageGallery: FC<IImageGalleryProps> = ({ currentPage, unfocused = 
             default:
                 setCurrentImageURL(imageArray[currentImageIndex][1]);
         }
-        // else if (currentImageURL !== imageArray[imageIndex][1]) setCurrentImageURL(imageArray[imageIndex][1]);
-    });
+    }, [currentPage, currentImageIndex]);
     return <AnimatePresence>
-        <MainBackground key={"mainBG"} url={currentImageURL} unfocused={(isZoomed && currentPage === 3) || unfocused}/>
+        <MainBackground
+            key={"mainBG"}
+            url={currentImageURL}
+            unfocused={(inZoomMode && currentPage === 3) || unfocused}
+            overrideDelay={currentPage === 3 ? 0 : undefined}
+        />
         {currentPage === 3 && <>
             <ImageViewer
                 imageArray={imageArray}
-                imageIndex={currentImageIndex}
-                onImageIndexChange={setCurrentImageIndex}
-                inZoomMode={isZoomed}
-                onImageFocusToggle={() => setIsZoomed(!isZoomed)}
             />
         </>}
     </AnimatePresence>;
@@ -53,113 +54,102 @@ export const ImageGallery: FC<IImageGalleryProps> = ({ currentPage, unfocused = 
 
 interface IImageViewerProps {
     imageArray: [string, string][];
-    imageIndex: number;
+    // imageIndex: number;
     onImageIndexChange?: (newIndex: number) => void;
     onImageFocusToggle?: (index: number) => void;
-    inZoomMode?: boolean;
+    // inZoomMode?: boolean;
 }
 const ImageViewer: FC<IImageViewerProps> = ({
     imageArray,
-    imageIndex,
     onImageIndexChange,
     onImageFocusToggle,
-    inZoomMode = false
 }) => {
     const [isPresent, safeToRemove] = usePresence();
-
+    const [imageGalleryInit] = useAtom(ImageGalleryInit);
     const [triggeredByMenu, setTriggeredByMenu] = useState(false);
-    // false means it's from outbound (init)
+
+    const [inZoomMode] = useAtom(InZoomMode);
+    const [currentImageIndex] = useAtom(ImageIndex);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const updateTriggeredOutbound = useCallback((value: boolean) => {
-        setTriggeredByMenu(() => value);
+        if (triggeredByMenu !== !value)
+            setTriggeredByMenu(() => !value);
     }, []);
 
     const commonTransition = {
         duration: 0.7,
-        ease: Forceful
+        ease: SlowDown
     };
 
     const imageViewVariants = {
         "initial-outbound": {
             // clipPath: "polygon(0% 0%, 0% 0%, 0% 0%, 0% 0%)",
             clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
-            transition: {
-                ...commonTransition,
-                delay: 0
-            }
+            y: 100
         },
         "initial-native": {
             clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)",
-            transition: {
-                ...commonTransition,
-                delay: 0
-            }
         },
         "expand": {
             clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)",
-            transition: {
-                ...commonTransition,
-                delay: triggeredByMenu ? 0 : 1.4
-            }
+            y: 0
         },
         "exit-outbound": {
             // clipPath: "polygon(100% 100%, 100% 100%, 100% 100%, 100% 100%)",
             clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
+            y: 100,
             transition: {
                 ...commonTransition,
-                delay: 0
+                ease: Forceful
             }
         },
         "exit-native": {
             clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)",
-            transition: {
-                ...commonTransition,
-                delay: 0
-            }
         }
     };
 
     const imageViewAnimController = useAnimation();
     const handleExpandToggle = useCallback((zoom: boolean) => {
-        if (triggeredByMenu) {
-            imageViewAnimController.set(zoom ? "initial-native" : "expand");
-            void imageViewAnimController.start(zoom ? "expand" : "exit-native");
-        }
-        else {
-            imageViewAnimController.set(zoom ? "initial-outbound" : "expand");
-            void imageViewAnimController.start(zoom ? "expand" : "exit-outbound");
-        }
-    }, [triggeredByMenu, isPresent]);
+        if (zoom)
+            imageViewAnimController.set("initial-native");
+        void imageViewAnimController
+            .start(zoom ? "expand" : "exit-native");
+    }, []);
 
     useEffect(() => {
+        if (inZoomMode)
+            void imageViewAnimController
+                .start(
+                    isPresent ? "expand" : "exit-outbound",
+                    isPresent ? { ...commonTransition, delay: 1.2 } : undefined
+                );
+        else
+            imageViewAnimController.set(isPresent ? "initial-outbound" : "initial-native");
         return () => {
-            updateTriggeredOutbound(false);
             safeToRemove?.();
         };
-    }, [isPresent, inZoomMode]);
+    }, [isPresent]);
 
     return <>
         <ImagePicker
             key={"imagePicker"}
             imageArray={imageArray}
-            initialImageIndex={imageIndex}
+            initialImageIndex={currentImageIndex}
             onImageIndexChange={(newIndex) => {
-                updateTriggeredOutbound(true);
-                onImageIndexChange?.(newIndex);
+                updateTriggeredOutbound(false);
+                if (newIndex !== currentImageIndex)
+                    onImageIndexChange?.(newIndex);
             }}
-            inZoomMode={inZoomMode}
             onImageFocusToggle={(i, willZoom) => {
-                updateTriggeredOutbound(true);
                 handleExpandToggle(willZoom);
                 onImageFocusToggle?.(i);
             }}
         />
         <ImageDesc
-            imageFocus={inZoomMode}
             key={"imageDesc"}
-            uponExit={() => updateTriggeredOutbound(false)}
+            uponExit={() => updateTriggeredOutbound(true)}
             text={(() => {
-                const imgName = imageArray[imageIndex][0].split("/").pop()?.split(".")[0];
+                const imgName = imageArray[currentImageIndex][0].split("/").pop()?.split(".")[0];
                 const text = locale(`image-desc.${imgName}`);
                 if (text.match(/^\{@/))
                     return `Extra image: ${imgName}`;
@@ -168,97 +158,150 @@ const ImageViewer: FC<IImageViewerProps> = ({
         >
             <MotionBox
                 flexGrow={1}
-                className={"fh fw rel"}
-                layout
+                className={"rel fw flex a-flex-center j-flex-center"}
+                h={100}
+                backdropFilter={"blur(10px)"}
+                variants={imageViewVariants}
+                animate={imageViewAnimController}
+                transition={commonTransition}
+                layout={"size"}
             >
-                <AnimatePresence>
-                    {isPresent && inZoomMode && <MotionBox
-                        className={"fh fw"}
-                        backdropFilter={"blur(10px)"}
-
-                        variants={imageViewVariants}
-                        initial={
-                            // triggeredByMenu ?
-                                "initial-native"
-                                // : "initial-outbound"
-                        }
-                        animate={"expand"}
-                        exit={
-                            // isPresent && inZoomMode ?
-                                "exit-native"
-                            // : "exit-outbound"
-                        }
-                        layout
-                    >
-                        {/*<Image src={imageArray[imageIndex][1]} alt="" layout={"fill"} objectFit={"contain"}/>*/}
-
-                        <AnimatePresence>
-                            <MotionBox
-                                key={`zoom-image-${imageIndex}`}
-                                className={"fh fw"}
-                                initial={{
-                                    opacity: 0,
-                                    // x: -20
-                                    // clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)"
-                                }}
-                                animate={{
-                                    opacity: 1,
-                                    // x: 0
-                                    // clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
-                                }}
-                                exit={{
-                                    opacity: 0,
-                                    // x: 20
-                                    // clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)"
-                                }}
-                                transition={{ duration: 0.5, ease: SlowDown }}
-                            >
-                                <Image src={imageArray[imageIndex][1]} alt="" layout={"fill"} objectFit={"contain"}/>
-                            </MotionBox>
-                        </AnimatePresence>
-                    </MotionBox>}
-                </AnimatePresence>
+                <MotionBox
+                    layout
+                    className={"rel fw"}
+                    style={{
+                        aspectRatio: "1920 / 1080"
+                    }}
+                    transition={commonTransition}
+                >
+                    <AnimatePresence>
+                        <MotionBox
+                            key={`image-zoom-${currentImageIndex}`}
+                            className={"abs fw flex a-flex-center j-flex-center"}
+                            m={"auto"}
+                            layout={"position"}
+                            initial={{
+                                opacity: 0,
+                                // x: -20
+                                // clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)"
+                            }}
+                            animate={{
+                                opacity: 1,
+                                // x: 0
+                                // clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
+                            }}
+                            exit={{
+                                opacity: 0,
+                                // x: 20
+                                // clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)"
+                            }}
+                            transition={{ duration: 0.5, ease: SlowDown }}
+                            bg={
+                                // `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`
+                                `url(${imageArray[currentImageIndex][1]})`
+                            }
+                            style={{
+                                aspectRatio: "1920 / 1080",
+                                backgroundSize: "contain",
+                                backgroundPosition: "center",
+                                backgroundRepeat: "no-repeat"
+                            }}
+                        />
+                    </AnimatePresence>
+                </MotionBox>
             </MotionBox>
         </ImageDesc>
     </>;
 };
 
+interface IImageZoomViewProps {
+    imageUrl: string;
+}
+const ImageZoomView: FC<IImageZoomViewProps> = ({ imageUrl }) => {
+    return <AnimatePresence>
+        <MotionBox
+            key={`url(${imageUrl.split("/").pop()})`}
+            className={"fw flex a-flex-center j-flex-center"}
+            initial={{
+                opacity: 0,
+                // x: -20
+                // clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)"
+            }}
+            animate={{
+                opacity: 1,
+                // x: 0
+                // clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
+            }}
+            exit={{
+                opacity: 0,
+                // x: 20
+                // clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)"
+            }}
+            transition={{ duration: 0.5, ease: SlowDown }}
+            bg={
+                // `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`
+                `url(${imageUrl})`
+            }
+            style={{
+                aspectRatio: "1920 / 1080",
+                backgroundSize: "contain",
+                backgroundPosition: "center",
+                backgroundRepeat: "no-repeat"
+            }}
+        />
+    </AnimatePresence>;
+};
+
 interface IImageDescProps {
     text: string;
-    imageFocus?: boolean;
     children?: ReactNode;
     uponExit?: () => void;
+    hideText?: boolean;
 }
-export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, uponExit, imageFocus = false, children }) => {
+export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = false, uponExit, children }) => {
     const [isExiting, setIsExiting] = useState(false);
     const [currentText, setCurrentText] = useState(upcomingText);
     const [bgText, setBgText] = useState(upcomingText);
+
+    const [inZoomMode] = useAtom(InZoomMode);
+    const [componentFirstInit, setComponentFirstInit] = useAtom(ImageGalleryInit);
+
     useEffect(() => {
+        const timeout = setTimeout(() => {
+            setComponentFirstInit(false);
+        }, 500);
         setCurrentText(() => upcomingText);
-        if (upcomingText.length < bgText.length && !imageFocus)
+        if (upcomingText.length < bgText.length && !inZoomMode)
             waitAsync(390).then(() => setBgText(() => upcomingText));
         else
             setBgText(() => upcomingText);
         return () => {
+            clearTimeout(timeout);
             setIsExiting(true);
             uponExit?.();
         };
     }, [upcomingText]);
-    return <Flex
+    return <MotionFlex
         fontFamily={"Oswald"}
         fontSize={"18px"}
-        className={"abs fw fh b0 z3 flex-col"}
-        left={"calc((100vh - 176px) / (438 / 154.29))"}
-        maxW={"calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"}
-        alignItems={imageFocus ? "stretch" : "flex-start"}
+        className={"abs fw fh b0 z3 flex-col-rev"}
+        left={
+            "calc((100vh - 176px) / (438 / 154.29))"
+            // 0
+        }
+        maxW={
+            "calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"
+            // "100vw"
+        }
+        alignItems={"flex-start"}
+        layout
     >
-        {children}
         <MotionFlex
             bg={"#FDFD1F"}
             className={"z3 flex-col overflow-hidden"}
-            initial={{ y: 80 }}
+            initial={{ y: componentFirstInit ? "100%" : 80 }}
             animate={{ y: 0 }}
-            exit={{ y: 80 }}
+            exit={{ y: componentFirstInit ? "100%" : 80 }}
             transition={{
                 duration: 0.7,
                 ease: SlowDown,
@@ -269,6 +312,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, uponExit, i
                 },
             }}
             maxW={"calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"}
+            alignSelf={inZoomMode ? "stretch": "flex-start"}
             layout
         >
             <MotionBox
@@ -307,11 +351,12 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, uponExit, i
                         initial={{
                             opacity: 0,
                             y: 20,
-                            paddingRight: 5
+                            paddingRight: 20
                         }}
                         animate={{
                             opacity: 1,
                             y: 0,
+                            maxHeight: hideText ? "0%" : "100%",
                             transition: {
                                 delay: 0.2,
                                 duration: 0.5,
@@ -321,7 +366,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, uponExit, i
                                     delay: 0.2,
                                     ease: SlowDown,
                                 }
-                            }
+                            },
                         }}
                         exit={{
                             opacity: 0,
@@ -340,7 +385,10 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, uponExit, i
                     as={"p"}
                     layout
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ y: 0 }}
+                    animate={{
+                        y: 0,
+                        maxHeight: hideText ? "0%" : "100%",
+                    }}
                     transition={{
                         delay: currentText?.length ?? 0 < bgText.length ? 0.2 : 0.5,
                         ease: Forceful,
@@ -356,14 +404,16 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, uponExit, i
                 </MotionBox>
             </MotionBox>
         </MotionFlex>
-    </Flex>;
+        {children}
+    </MotionFlex>;
 };
 
 interface IMainBackgroundProps {
     url?: string;
     unfocused?: boolean;
+    overrideDelay?: number;
 }
-const MainBackground: FC<IMainBackgroundProps> = ({ url, unfocused = false }) => {
+const MainBackground: FC<IMainBackgroundProps> = ({ url, unfocused = false, overrideDelay }) => {
     return (
         <AnimatePresence>
             <MotionBox
@@ -379,7 +429,7 @@ const MainBackground: FC<IMainBackgroundProps> = ({ url, unfocused = false }) =>
                 exit={{ opacity: 0 }}
                 transition={{
                     duration: 0.5,
-                    delay: 0.45,
+                    delay: overrideDelay ?? 0.45,
                     ease: Forceful,
                     filter: {
                         delay: unfocused ? 0.5 : 0,
@@ -408,18 +458,17 @@ interface IImagePickerProps {
     initialImageIndex: number;
     onImageIndexChange?: (newIndex: number) => void;
     onImageFocusToggle?: (index: number, willZoom: boolean) => void;
-    inZoomMode?: boolean;
 }
 export const ImagePicker: FC<IImagePickerProps> = ({
     imageArray,
-    initialImageIndex,
+    // initialImageIndex,
     onImageIndexChange,
     onImageFocusToggle,
-    inZoomMode = false
 }) => {
+    const [inZoomMode, setInZoomMode] = useAtom(InZoomMode);
     const [isHovering, setIsHovering] = useState(false);
     const [isExiting, setIsExiting] = useState(false);
-    const [currentImageIndex, setCurrentImageIndex] = useState<Nullable<number>>(initialImageIndex);
+    const [currentImageIndex, setCurrentImageIndex] = useAtom(ImageIndex);
     const [currentHoveredIndex, setCurrentHoveredIndex] = useState<Nullable<number>>(null);
     const [prevHoveredIndex, setPrevHoveredIndex] = useState<Nullable<number>>(null);
 
@@ -483,7 +532,11 @@ export const ImagePicker: FC<IImagePickerProps> = ({
                         return i;
                     });
                     if (currentImageIndex === i)
-                        onImageFocusToggle?.(i, !inZoomMode);
+                    {
+                        const flip = !inZoomMode;
+                        setInZoomMode(flip);
+                        onImageFocusToggle?.(i, flip);
+                    }
                 }}
                 onHoverCapture={() => updateHoverIndex(i)}
                 isHoveredOutbound={currentHoveredIndex === i}

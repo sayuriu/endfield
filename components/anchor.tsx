@@ -1,8 +1,6 @@
 import { motion, MotionProps } from "framer-motion";
 import { FC, ReactNode, useEffect, useState } from "react";
-import { AnimFunctions } from "@utils/anims";
-
-const { Forceful } = AnimFunctions;
+import { Forceful } from "@utils/anims";
 
 interface AnchorProps {
     to: string;

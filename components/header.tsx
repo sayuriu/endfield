@@ -6,15 +6,13 @@ import { AnimatePresence, motion } from "framer-motion";
 
 import { AvailableLanguages, Language, LanguagePack } from "@states/global";
 import { localGet, localSet, Nullable, OverridableStyle, useLocale } from "@utils/common";
-import { AnimFunctions } from "@utils/anims";
+import { Forceful, SlowDown } from "@utils/anims";
 import { MotionBox } from "./motion";
 import { LogoSmall_CN } from "@components/logo/CN/CN-small";
 import { LogoSmall_EN } from "@components/logo/EN/EN-small";
 import { LogoSmall_JP } from "@components/logo/JP/JP-small";
 import { LogoSmall_KR } from "@components/logo/KR/KR-small";
 import { Checkbox } from "@components/checkbox";
-
-const { Forceful, SlowDown } = AnimFunctions;
 
 function resolveConfig(lang: Nullable<string>)
 {

@@ -1,38 +1,45 @@
 import Image from 'next/image';
 import { Box } from "@chakra-ui/react";
 import { useAtom } from "jotai";
-import { Language, ImageData, LanguagePack } from "@states/global";
-import { FC, ReactNode, useEffect, useMemo, useState } from "react";
-import { AnimatePresence, motion, usePresence } from "framer-motion";
+import { Language, ImageData, LanguagePack, IsPortrait } from "@states/global";
+import { FC, useEffect, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 
 import bodyStyles from './body/Body.module.scss';
 import { Logger } from "@utils/logger";
-import { AnimFunctions } from "@utils/anims";
-import { joinClasses, Nullable, useLocale } from "@utils/common";
+import { Forceful, SpeedUp } from "@utils/anims";
+import { joinClasses, useLocale } from "@utils/common";
 import { LeftPanel } from "@components/body/left-panel";
 import { RightPanel } from "@components/body/right-panel";
 import { MotionBox } from "@components/motion";
-// import { ImageDesc, ImageGallery, ImagePanel } from "@components/Images";
-import { ImageGallery } from "@components/images2";
-
-const { Forceful, SpeedUp, SlowDown } = AnimFunctions;
+import { ImageGallery, ImageGalleryInit } from "@components/images";
 
 export const Body = () => {
     // const [imageData] = useAtom(ImageData);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
-    const [currentPage, setCurrentPage] = useState(3);
+    const [, setGalleryInit] = useAtom(ImageGalleryInit);
+
+    const [currentPage, setCurrentPage] = useState(1);
     const changePage = (to: number) => {
         if (to === currentPage) return;
+        if (to !== 3)
+            setGalleryInit(false);
         setCurrentPage(to);
+    };
+    const [isPortrait, setIsPortrait] = useAtom(IsPortrait);
+    const listener = () => {
+        const newPortraitState = window.innerHeight / window.innerWidth < 1165 / 967;
+        if (isPortrait !== newPortraitState)
+            setIsPortrait(newPortraitState);
     };
 
     useEffect(() => {
-        const interval = setInterval(() => {});
-
+        listener();
+        window.addEventListener('resize', listener);
         return () => {
-            clearInterval(interval);
+            window.removeEventListener('resize', listener);
         };
-    }, []);
+    }, [isPortrait]);
     return (<MotionBox
         h="calc(100vh - 176px)"
         w="100vw"
@@ -42,7 +49,9 @@ export const Body = () => {
     >
         <DesktopPanel
             LPanelOnIndexAnimStart={(from, to) => changePage(to)}
-            LPanelIndexChange={setCurrentPage}
+            LPanelIndexChange={(newPageIndex) => {
+                setCurrentPage(newPageIndex);
+            }}
             RPanelCurrentIndex={currentPage}
             InitialIndex={currentPage}
         />
@@ -206,20 +215,9 @@ interface IDesktopPanelProps {
     InitialIndex?: number;
 }
 const DesktopPanel: FC<IDesktopPanelProps> = ({ LPanelOnIndexAnimStart, LPanelIndexChange, RPanelCurrentIndex, InitialIndex }) => {
-    const [isPortrait, setIsPortrait] = useState(false);
-    const listener = () => {
-        const portrait = window.innerHeight / window.innerWidth < 1165 / 967;
-        if (isPortrait !== portrait)
-            setIsPortrait(_current => portrait !== _current ? portrait : _current);
-    };
-    useEffect(() => {
-        listener();
-        window.addEventListener('resize', listener);
-
-        return () => {
-            window.removeEventListener('resize', listener);
-        };
-    }, [isPortrait]);
+    // const []
+    const [isPortrait] = useAtom(IsPortrait);
+    useEffect(() => {}, [isPortrait]);
     return (
         <AnimatePresence>
             {isPortrait && <>
