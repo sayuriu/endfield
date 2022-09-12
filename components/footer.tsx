@@ -10,8 +10,10 @@ import { Anchor } from "@components/anchor";
 import terrainStyles from "./terrain.module.scss";
 import { Language, LanguagePack } from "@states/global";
 import { useAtom } from "jotai";
+import { InImageFullScreenMode } from "@components/images";
 
 export const Footer:  FC = () => {
+    const [inImageFullScreenMode] = useAtom(InImageFullScreenMode);
     const LogoAnimConfig = (delay = 0) => ({
         initial: {
             y: 50,
@@ -30,7 +32,7 @@ export const Footer:  FC = () => {
         <motion.div
             className={"abs l0"}
             initial={{ bottom: -90 }}
-            animate={{ bottom: 0 }}
+            animate={{ bottom: inImageFullScreenMode ? -90 : 0 }}
             transition={{ duration: 0.5, ease: Forceful }}
         >
             <Box

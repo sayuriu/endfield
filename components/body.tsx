@@ -12,10 +12,11 @@ import { joinClasses, useLocale } from "@utils/common";
 import { LeftPanel } from "@components/body/left-panel";
 import { RightPanel } from "@components/body/right-panel";
 import { MotionBox } from "@components/motion";
-import { ImageGallery, ImageGalleryInit } from "@components/images";
+import { ImageGallery, ImageGalleryInit, InImageFullScreenMode } from "@components/images";
 
 export const Body = () => {
     // const [imageData] = useAtom(ImageData);
+    const [inImageFullScreenMode] = useAtom(InImageFullScreenMode);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
     const [, setGalleryInit] = useAtom(ImageGalleryInit);
 
@@ -41,9 +42,14 @@ export const Body = () => {
         };
     }, [isPortrait]);
     return (<MotionBox
-        h="calc(100vh - 176px)"
+        h={
+            inImageFullScreenMode ?
+                "calc(100vh - 0px)" :
+                "calc(100vh - 176px)"
+        }
         w="100vw"
         p={0}
+        transition={{ duration: 0.7, ease: Forceful }}
         className={joinClasses(bodyStyles["content"], "rel grid overflow-hidden")}
         layout
     >

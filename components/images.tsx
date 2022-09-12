@@ -11,8 +11,12 @@ import { MotionBox, MotionFlex } from "@components/motion";
 import { Box, Flex } from "@chakra-ui/react";
 
 const ImageIndex = atom(2);
-export const ImageGalleryInit = atom(true);
 const InZoomMode = atom(false);
+export const ImageGalleryInit = atom(true);
+export const InImageFullScreenMode = atom(false);
+
+const MouseMoveInZoomMode = atom(false);
+const MouseMoveInZoomModeTimeout = atom<Nullable<number>>(null);
 
 interface IImageGalleryProps {
     currentPage: number;
@@ -65,13 +69,17 @@ const ImageViewer: FC<IImageViewerProps> = ({
     onImageFocusToggle,
 }) => {
     const [isPresent, safeToRemove] = usePresence();
-    const [imageGalleryInit] = useAtom(ImageGalleryInit);
-    const [triggeredByMenu, setTriggeredByMenu] = useState(false);
 
+    const [inImageFullScreenMode, setInImageFullScreenMode] = useAtom(InImageFullScreenMode);
+    const [,setMouseMove] = useAtom(MouseMoveInZoomMode);
+    const [imageGalleryInit] = useAtom(ImageGalleryInit);
     const [,setComponentFirstInit] = useAtom(ImageGalleryInit);
     const [inZoomMode] = useAtom(InZoomMode);
     const [currentImageIndex] = useAtom(ImageIndex);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
+
+    const [triggeredByMenu, setTriggeredByMenu] = useState(false);
+
     const updateTriggeredOutbound = useCallback((value: boolean) => {
         if (triggeredByMenu !== !value)
             setTriggeredByMenu(() => !value);
@@ -100,7 +108,7 @@ const ImageViewer: FC<IImageViewerProps> = ({
             clipPath: "polygon(0% 100%, 100% 100%, 100% 100%, 0% 100%)",
             y: 100,
             transition: {
-                ...commonTransition,
+                duration: 1,
                 ease: Forceful
             }
         },
@@ -117,12 +125,23 @@ const ImageViewer: FC<IImageViewerProps> = ({
             .start(zoom ? "expand" : "exit-native");
     }, []);
 
+    const listener = useCallback((e: KeyboardEvent) => {
+        Logger.instance.debug({}, "ImageViewer", "Keydown", e.key);
+        if (e.key === "Escape") {
+            setInImageFullScreenMode(false);
+            // handleExpandToggle(false);
+        }
+    }, []);
+
     useEffect(() => {
         let timeout: NodeJS.Timeout;
         if (isPresent)
+        {
             timeout = setTimeout(() => {
                 setComponentFirstInit(false);
             }, 500);
+            window.addEventListener("keydown", listener);
+        }
         if (inZoomMode)
             void imageViewAnimController
                 .start(
@@ -135,7 +154,10 @@ const ImageViewer: FC<IImageViewerProps> = ({
             if (isPresent && timeout)
                 clearTimeout(timeout);
             else if (!isPresent)
+            {
+                window.removeEventListener("keydown", listener);
                 setComponentFirstInit(true);
+            }
             safeToRemove?.();
         };
     }, [isPresent]);
@@ -156,6 +178,7 @@ const ImageViewer: FC<IImageViewerProps> = ({
             }}
         />
         <ImageDesc
+            hideText={inImageFullScreenMode}
             key={"imageDesc"}
             uponExit={() => updateTriggeredOutbound(true)}
             text={(() => {
@@ -186,11 +209,14 @@ const ImageViewer: FC<IImageViewerProps> = ({
                     transition={commonTransition}
                 >
                     <AnimatePresence>
-                        <MotionBox
+                        <MotionFlex
+                            onMouseMove={() => setMouseMove(true)}
                             key={`image-zoom-${currentImageIndex}`}
-                            className={"abs fw flex a-flex-center j-flex-center"}
+                            className={"abs fw"}
                             m={"auto"}
                             layout={"position"}
+                            justifyContent={"flex-end"}
+                            alignItems={"flex-end"}
                             initial={{
                                 opacity: 0,
                                 // x: -20
@@ -217,7 +243,9 @@ const ImageViewer: FC<IImageViewerProps> = ({
                                 backgroundPosition: "center",
                                 backgroundRepeat: "no-repeat"
                             }}
-                        />
+                        >
+                            <ImageToolbar/>
+                        </MotionFlex>
                     </AnimatePresence>
                 </MotionBox>
             </MotionBox>
@@ -237,6 +265,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
     const [bgText, setBgText] = useState(upcomingText);
 
     const [inZoomMode] = useAtom(InZoomMode);
+    const [inImageFullScreenMode] = useAtom(InImageFullScreenMode);
     // const [componentFirstInit] = useAtom(ImageGalleryInit);
 
     useEffect(() => {
@@ -255,14 +284,21 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
     return <MotionFlex
         fontFamily={"Oswald"}
         fontSize={"18px"}
-        className={"abs fw fh b0 z3 flex-col"}
+        className={"abs fw fh t0 z3 flex-col"}
         left={
-            "calc((100vh - 176px) / (438 / 154.29))"
-            // 0
+            inImageFullScreenMode ?
+                0 :
+                "calc((100vh - 176px) / (438 / 154.29))"
         }
         maxW={
-            "calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"
-            // "100vw"
+            inImageFullScreenMode ?
+                "100vw" :
+                "calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"
+        }
+        h={
+            inImageFullScreenMode ?
+                "100vh" :
+                "calc(100vh - 176px)"
         }
         alignItems={"flex-start"}
         layout
@@ -279,7 +315,10 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                 // @min-res: 800x600
                 return /* componentFirstInit ? "100%" : */ 101;
             })() }}
-            animate={{ y: 0 }}
+            animate={{
+                y: 0,
+                maxHeight: hideText ? "0%" : "100%",
+            }}
             exit={{ y: /* "100%" */ 101 }}
             transition={{
                 duration: 0.7,
@@ -290,18 +329,23 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                     ease: isExiting ? Forceful : SlowDown,
                 },
             }}
-            maxW={"calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"}
-            alignSelf={inZoomMode ? "stretch": "flex-start"}
+            maxW={
+                inImageFullScreenMode ?
+                    "100vw" :
+                    "calc(100vw - (100vh - 176px) / (438 / 154.29) - clamp(100px, 20vw, 270px) - 10px)"
+            }
+            alignSelf={(inZoomMode || inImageFullScreenMode) ? "stretch": "flex-start"}
             layout
         >
             <MotionBox
-                p={"10px 20px"}
+                p={hideText ? "0px 20px" : "10px 20px"}
                 className={"rel overflow-hidden"}
                 initial={{
                     y: 80
                 }}
                 animate={{
-                    y: 0
+                    y: 0,
+                    maxHeight: hideText ? "0%" : "100%",
                 }}
                 exit={{
                     y: 80
@@ -365,7 +409,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{
                         y: 0,
-                        // maxHeight: hideText ? "0%" : "100%",
+                        maxHeight: hideText ? "0%" : "100%",
                     }}
                     transition={{
                         delay: currentText?.length ?? 0 < bgText.length ? 0.2 : 0.5,
@@ -693,14 +737,141 @@ export const Image2: FC<ImageProps & IImage2Props> = ({
     </MotionBox>;
 };
 
-const MagnifierIcon: FC<{ height: number, width: number } & MotionProps> = ({ ...props }) => {
-    return <motion.svg viewBox="27.773 30.899 200.45 200.054" {...props}>
-        <ellipse
-            stroke={"#000"}
+
+const ImageToolbar = () => {
+    const [mouseMove, setMouseMove] = useAtom(MouseMoveInZoomMode);
+    const [mouseTriggerTimeout, setMouseTriggerTimeout] = useAtom(MouseMoveInZoomModeTimeout);
+    const [forceHover, setForceHover] = useState(false);
+
+    const triggerMouse = useCallback(() => {
+        if (mouseTriggerTimeout) {
+            clearTimeout(mouseTriggerTimeout);
+        }
+        setMouseMove(true);
+        setMouseTriggerTimeout(setTimeout(() => {
+            setMouseMove(false);
+            setMouseTriggerTimeout(null);
+        }, 5000) as unknown as number);
+    }, []);
+
+    const commonTransition = {
+        duration: 0.7,
+        ease: Forceful
+    };
+
+    return <MotionFlex
+        initial={{
+            opacity: 0,
+        }}
+        animate={{
+            opacity: mouseMove ? 1 : 0
+        }}
+        transition={{
+            ...commonTransition,
+            delay: mouseMove ? 0 : 1
+        }}
+        layout={"position"}
+    >
+        <DownloadIcon
+            hoverAnimation
+            overrideFG={"#eee"}
+            animate={{
+                width: 100,
+                height: 100,
+                opacity: .3,
+            }}
+            whileHover={{ opacity: 1 }}
+            transition={commonTransition}
+            layout={"position"}
+        />
+        <MagnifierIcon
+            overrideFG={"#eee"}
+            animate={{
+                width: 100,
+                height: 100,
+                opacity: .3,
+            }}
+            whileHover={{ opacity: 1 }}
+            transition={commonTransition}
+            layout={"position"}
+        />
+    </MotionFlex>;
+};
+
+interface IIconProps {
+    height?: number;
+    width?: number;
+    overrideFG?: string;
+}
+
+const MagnifierIcon: FC<IIconProps & MotionProps & { hoverAnimation?: boolean }> = ({ hoverAnimation, overrideFG, ...props }) => {
+    // const [isHovered, setIsHovered] = useState(false);
+    const [inImageFullScreenMode, setInImageFullScreenMode] = useAtom(InImageFullScreenMode);
+    const commonTransition = {
+        duration: 0.7,
+        ease: Forceful
+    };
+    return <motion.svg
+        viewBox="27.773 30.899 200.45 200.054"
+        transition={commonTransition}
+        onClick={() => setInImageFullScreenMode(!inImageFullScreenMode)}
+        {...props}
+        // {...(hoverAnimation ? {
+        //     onHoverStart: () => setIsHovered(true),
+        //     onHoverEnd: () => setIsHovered(false),
+        // } : {})}
+    >
+        <motion.ellipse
+            stroke={overrideFG ?? "#000"}
             fill={"none"}
             strokeWidth={21}
             cx="140.823" cy="113.291"
             rx="61.4" ry="61.392"/>
-        <path stroke={"#000"} d="M 90.429 147.98 L 104.746 162.298 L 42.091 224.953 L 27.773 210.635 L 90.429 147.98 Z"></path>
+        <path stroke={overrideFG ?? "#000"} fill={overrideFG ?? "#000"} d="M 90.429 147.98 L 104.746 162.298 L 42.091 224.953 L 27.773 210.635 L 90.429 147.98 Z"></path>
+    </motion.svg>;
+};
+
+const DownloadIcon: FC<IIconProps & MotionProps & { hoverAnimation?: boolean }> = ({ hoverAnimation = false, overrideFG, ...props }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const imageData = useAtom(ImageData)[0];
+    const imageIndex = useAtom(ImageIndex)[0];
+    const commonTransition = {
+        duration: 0.7,
+        ease: Forceful
+    };
+    return <motion.svg
+        viewBox="191.899 73.887 67.067 73.923"
+        cursor={"pointer"}
+        transition={commonTransition}
+        onClick={() => window.open([...imageData.keys()][imageIndex])}
+        style={{ mixBlendMode: "exclusion" }}
+        {...props}
+        {...(hoverAnimation ? {
+            onHoverStart: () => setIsHovered(true),
+            onHoverEnd: () => setIsHovered(false),
+        } : {})}
+    >
+        <motion.g
+            fill={overrideFG ?? "#000"}
+            transition={commonTransition}
+        >
+            <motion.rect
+                transition={commonTransition}
+                x="220.568"
+                animate={{
+                    y: isHovered ? 73.887 + 10 : 73.887 - 2,
+                    height: isHovered ? 55.054 - 10 : 55.054 + 2,
+                }}
+                width="9.039"
+            />
+            <motion.path
+                animate={{
+                    y: isHovered ? 3 : 0,
+                }}
+                transition={commonTransition}
+                d="M 194.003 102.311 L 199.783 96.531 L 230.827 127.576 L 225.048 133.356 L 194.003 102.311 Z M 250.403 96.607 L 256.13 102.334 L 225.151 133.314 L 219.423 127.587 L 250.403 96.607 Z"
+            />
+        </motion.g>
+        <path fill={overrideFG ?? "#000"} d="M 191.905 120.825 L 200.076 120.825 L 200.076 147.501 L 195.99 147.501 C 193.734 147.501 191.905 145.665 191.905 143.401 L 191.905 120.825 Z M 250.785 120.8 L 258.956 120.8 L 258.956 143.376 C 258.956 145.64 257.127 147.476 254.871 147.476 L 250.785 147.476 L 250.785 120.8 Z M 258.966 139.599 L 258.966 143.685 C 258.966 145.941 257.13 147.771 254.865 147.772 L 195.998 147.81 C 193.734 147.811 191.899 145.984 191.899 143.727 L 191.899 139.641 L 258.966 139.599 Z"></path>
     </motion.svg>;
 };

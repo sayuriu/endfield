@@ -13,6 +13,7 @@ import { LogoSmall_EN } from "@components/logo/EN/EN-small";
 import { LogoSmall_JP } from "@components/logo/JP/JP-small";
 import { LogoSmall_KR } from "@components/logo/KR/KR-small";
 import { Checkbox } from "@components/checkbox";
+import { InImageFullScreenMode } from "@components/images";
 
 function resolveConfig(lang: Nullable<string>)
 {
@@ -54,6 +55,8 @@ const transition = {
 export const Header: FC = () => {
     const router = useRouter();
     const [currentLanguage, setCurrentLanguage] = useAtom(Language);
+    const [inImageFullScreenMode] = useAtom(InImageFullScreenMode);
+
     const [settingsUIVisible, setSettingsUIVisible] = useState(false);
     const [logoStyle, setLogoStyle] = useState(currentLanguage);
 
@@ -83,7 +86,7 @@ export const Header: FC = () => {
             <motion.div
                 className={"abs l0 z5"}
                 initial={{ top: -90 }}
-                animate={{ top: 0 }}
+                animate={{ top: inImageFullScreenMode ? -90 : 0 }}
                 transition={{ duration: 0.5, ease: Forceful }}
             >
                 <Box
