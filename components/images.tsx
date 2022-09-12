@@ -123,8 +123,8 @@ const ImageViewer: FC<IImageViewerProps> = ({
                     isPresent ? "expand" : "exit-outbound",
                     isPresent ? { ...commonTransition, delay: 1.2 } : undefined
                 );
-        else
-            imageViewAnimController.set(isPresent ? "initial-outbound" : "initial-native");
+        else if (imageGalleryInit)
+            void imageViewAnimController.set(isPresent ? "initial-outbound" : "initial-native");
         return () => {
             safeToRemove?.();
         };
@@ -162,6 +162,7 @@ const ImageViewer: FC<IImageViewerProps> = ({
                 h={100}
                 backdropFilter={"blur(10px)"}
                 variants={imageViewVariants}
+                initial={"initial-outbound"}
                 animate={imageViewAnimController}
                 transition={commonTransition}
                 layout={"size"}
@@ -214,44 +215,6 @@ const ImageViewer: FC<IImageViewerProps> = ({
     </>;
 };
 
-interface IImageZoomViewProps {
-    imageUrl: string;
-}
-const ImageZoomView: FC<IImageZoomViewProps> = ({ imageUrl }) => {
-    return <AnimatePresence>
-        <MotionBox
-            key={`url(${imageUrl.split("/").pop()})`}
-            className={"fw flex a-flex-center j-flex-center"}
-            initial={{
-                opacity: 0,
-                // x: -20
-                // clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)"
-            }}
-            animate={{
-                opacity: 1,
-                // x: 0
-                // clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
-            }}
-            exit={{
-                opacity: 0,
-                // x: 20
-                // clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)"
-            }}
-            transition={{ duration: 0.5, ease: SlowDown }}
-            bg={
-                // `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`
-                `url(${imageUrl})`
-            }
-            style={{
-                aspectRatio: "1920 / 1080",
-                backgroundSize: "contain",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat"
-            }}
-        />
-    </AnimatePresence>;
-};
-
 interface IImageDescProps {
     text: string;
     children?: ReactNode;
@@ -271,6 +234,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
             setComponentFirstInit(false);
         }, 500);
         setCurrentText(() => upcomingText);
+        Logger.instance.debug({}, "ImageDesc", "Text updated", upcomingText.length, bgText.length);
         if (upcomingText.length < bgText.length && !inZoomMode)
             waitAsync(390).then(() => setBgText(() => upcomingText));
         else
@@ -284,7 +248,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
     return <MotionFlex
         fontFamily={"Oswald"}
         fontSize={"18px"}
-        className={"abs fw fh b0 z3 flex-col-rev"}
+        className={"abs fw fh b0 z3 flex-col"}
         left={
             "calc((100vh - 176px) / (438 / 154.29))"
             // 0
@@ -296,9 +260,10 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
         alignItems={"flex-start"}
         layout
     >
+        {children}
         <MotionFlex
             bg={"#FDFD1F"}
-            className={"z3 flex-col overflow-hidden"}
+            className={"b0 z3 flex-col"}
             initial={{ y: componentFirstInit ? "100%" : 80 }}
             animate={{ y: 0 }}
             exit={{ y: componentFirstInit ? "100%" : 80 }}
@@ -319,7 +284,6 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                 p={"10px 20px"}
                 className={"rel"}
                 initial={{
-                    flexGrow: 1,
                     y: 80
                 }}
                 animate={{
@@ -378,7 +342,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                             }
                         }}
                     >
-                        {currentText}
+                        {/*{currentText}*/}
                     </MotionBox>
                 </AnimatePresence>
                 <MotionBox
@@ -387,7 +351,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{
                         y: 0,
-                        maxHeight: hideText ? "0%" : "100%",
+                        // maxHeight: hideText ? "0%" : "100%",
                     }}
                     transition={{
                         delay: currentText?.length ?? 0 < bgText.length ? 0.2 : 0.5,
@@ -404,7 +368,6 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                 </MotionBox>
             </MotionBox>
         </MotionFlex>
-        {children}
     </MotionFlex>;
 };
 
