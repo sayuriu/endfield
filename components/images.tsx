@@ -68,6 +68,7 @@ const ImageViewer: FC<IImageViewerProps> = ({
     const [imageGalleryInit] = useAtom(ImageGalleryInit);
     const [triggeredByMenu, setTriggeredByMenu] = useState(false);
 
+    const [,setComponentFirstInit] = useAtom(ImageGalleryInit);
     const [inZoomMode] = useAtom(InZoomMode);
     const [currentImageIndex] = useAtom(ImageIndex);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
@@ -117,15 +118,24 @@ const ImageViewer: FC<IImageViewerProps> = ({
     }, []);
 
     useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        if (isPresent)
+            timeout = setTimeout(() => {
+                setComponentFirstInit(false);
+            }, 500);
         if (inZoomMode)
             void imageViewAnimController
                 .start(
                     isPresent ? "expand" : "exit-outbound",
                     isPresent ? { ...commonTransition, delay: 1.2 } : undefined
                 );
-        else
-            imageViewAnimController.set(isPresent ? "initial-outbound" : "initial-native");
+        else if (imageGalleryInit)
+            void imageViewAnimController.set(isPresent ? "initial-outbound" : "initial-native");
         return () => {
+            if (isPresent && timeout)
+                clearTimeout(timeout);
+            else if (!isPresent)
+                setComponentFirstInit(true);
             safeToRemove?.();
         };
     }, [isPresent]);
@@ -162,6 +172,7 @@ const ImageViewer: FC<IImageViewerProps> = ({
                 h={100}
                 backdropFilter={"blur(10px)"}
                 variants={imageViewVariants}
+                initial={"initial-outbound"}
                 animate={imageViewAnimController}
                 transition={commonTransition}
                 layout={"size"}
@@ -214,44 +225,6 @@ const ImageViewer: FC<IImageViewerProps> = ({
     </>;
 };
 
-interface IImageZoomViewProps {
-    imageUrl: string;
-}
-const ImageZoomView: FC<IImageZoomViewProps> = ({ imageUrl }) => {
-    return <AnimatePresence>
-        <MotionBox
-            key={`url(${imageUrl.split("/").pop()})`}
-            className={"fw flex a-flex-center j-flex-center"}
-            initial={{
-                opacity: 0,
-                // x: -20
-                // clipPath: "polygon(0% 0%, 0% 0%, 0% 100%, 0% 100%)"
-            }}
-            animate={{
-                opacity: 1,
-                // x: 0
-                // clipPath: "polygon(0% 0%, 100% 0%, 100% 100%, 0% 100%)"
-            }}
-            exit={{
-                opacity: 0,
-                // x: 20
-                // clipPath: "polygon(100% 0%, 100% 0%, 100% 100%, 100% 100%)"
-            }}
-            transition={{ duration: 0.5, ease: SlowDown }}
-            bg={
-                // `#${Math.floor(Math.random() * 0xFFFFFF).toString(16).padStart(6, '0')}`
-                `url(${imageUrl})`
-            }
-            style={{
-                aspectRatio: "1920 / 1080",
-                backgroundSize: "contain",
-                backgroundPosition: "center",
-                backgroundRepeat: "no-repeat"
-            }}
-        />
-    </AnimatePresence>;
-};
-
 interface IImageDescProps {
     text: string;
     children?: ReactNode;
@@ -264,27 +237,25 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
     const [bgText, setBgText] = useState(upcomingText);
 
     const [inZoomMode] = useAtom(InZoomMode);
-    const [componentFirstInit, setComponentFirstInit] = useAtom(ImageGalleryInit);
+    // const [componentFirstInit] = useAtom(ImageGalleryInit);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            setComponentFirstInit(false);
-        }, 500);
         setCurrentText(() => upcomingText);
+        // The description text is wrapped instantly when the new text changes that has a shorter length,
+        // resulting in a displeasing visual effect. This is a workaround to prevent that.
         if (upcomingText.length < bgText.length && !inZoomMode)
             waitAsync(390).then(() => setBgText(() => upcomingText));
         else
             setBgText(() => upcomingText);
         return () => {
-            clearTimeout(timeout);
-            setIsExiting(true);
             uponExit?.();
+            setIsExiting(true);
         };
     }, [upcomingText]);
     return <MotionFlex
         fontFamily={"Oswald"}
         fontSize={"18px"}
-        className={"abs fw fh b0 z3 flex-col-rev"}
+        className={"abs fw fh b0 z3 flex-col"}
         left={
             "calc((100vh - 176px) / (438 / 154.29))"
             // 0
@@ -296,12 +267,20 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
         alignItems={"flex-start"}
         layout
     >
+        {children}
         <MotionFlex
             bg={"#FDFD1F"}
-            className={"z3 flex-col overflow-hidden"}
-            initial={{ y: componentFirstInit ? "100%" : 80 }}
+            className={"z3 rel flex-col-rev"}
+            initial={{ y: (() => {
+                // Widget's dimension transition is distorted when set to a relative height.
+                // Apparently, it's unfixable, partly because
+                // the timing between ImageGallery's first initialization vs. this component's first initialization is different.
+                // So, I've set the height to 101 since it's the maximum height of the text when it's fully expanded.
+                // @min-res: 800x600
+                return /* componentFirstInit ? "100%" : */ 101;
+            })() }}
             animate={{ y: 0 }}
-            exit={{ y: componentFirstInit ? "100%" : 80 }}
+            exit={{ y: /* "100%" */ 101 }}
             transition={{
                 duration: 0.7,
                 ease: SlowDown,
@@ -317,9 +296,8 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
         >
             <MotionBox
                 p={"10px 20px"}
-                className={"rel"}
+                className={"rel overflow-hidden"}
                 initial={{
-                    flexGrow: 1,
                     y: 80
                 }}
                 animate={{
@@ -344,7 +322,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                 <AnimatePresence>
                     <MotionBox
                         key={`text-desc-${currentText[0]}-${currentText.length}`}
-                        className={"abs overflow-hidden"}
+                        className={"abs"}
                         as={"p"}
                         color={"#fff"}
                         layout={"position"}
@@ -387,7 +365,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                     initial={{ opacity: 0, y: 20 }}
                     animate={{
                         y: 0,
-                        maxHeight: hideText ? "0%" : "100%",
+                        // maxHeight: hideText ? "0%" : "100%",
                     }}
                     transition={{
                         delay: currentText?.length ?? 0 < bgText.length ? 0.2 : 0.5,
@@ -404,7 +382,6 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                 </MotionBox>
             </MotionBox>
         </MotionFlex>
-        {children}
     </MotionFlex>;
 };
 
