@@ -68,6 +68,7 @@ const ImageViewer: FC<IImageViewerProps> = ({
     const [imageGalleryInit] = useAtom(ImageGalleryInit);
     const [triggeredByMenu, setTriggeredByMenu] = useState(false);
 
+    const [,setComponentFirstInit] = useAtom(ImageGalleryInit);
     const [inZoomMode] = useAtom(InZoomMode);
     const [currentImageIndex] = useAtom(ImageIndex);
     const locale = useLocale(useAtom(Language)[0], useAtom(LanguagePack)[0]);
@@ -117,6 +118,11 @@ const ImageViewer: FC<IImageViewerProps> = ({
     }, []);
 
     useEffect(() => {
+        let timeout: NodeJS.Timeout;
+        if (isPresent)
+            timeout = setTimeout(() => {
+                setComponentFirstInit(false);
+            }, 500);
         if (inZoomMode)
             void imageViewAnimController
                 .start(
@@ -126,6 +132,10 @@ const ImageViewer: FC<IImageViewerProps> = ({
         else if (imageGalleryInit)
             void imageViewAnimController.set(isPresent ? "initial-outbound" : "initial-native");
         return () => {
+            if (isPresent && timeout)
+                clearTimeout(timeout);
+            else if (!isPresent)
+                setComponentFirstInit(true);
             safeToRemove?.();
         };
     }, [isPresent]);
@@ -227,22 +237,19 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
     const [bgText, setBgText] = useState(upcomingText);
 
     const [inZoomMode] = useAtom(InZoomMode);
-    const [componentFirstInit, setComponentFirstInit] = useAtom(ImageGalleryInit);
+    // const [componentFirstInit] = useAtom(ImageGalleryInit);
 
     useEffect(() => {
-        const timeout = setTimeout(() => {
-            setComponentFirstInit(false);
-        }, 500);
         setCurrentText(() => upcomingText);
-        Logger.instance.debug({}, "ImageDesc", "Text updated", upcomingText.length, bgText.length);
+        // The description text is wrapped instantly when the new text changes that has a shorter length,
+        // resulting in a displeasing visual effect. This is a workaround to prevent that.
         if (upcomingText.length < bgText.length && !inZoomMode)
             waitAsync(390).then(() => setBgText(() => upcomingText));
         else
             setBgText(() => upcomingText);
         return () => {
-            clearTimeout(timeout);
-            setIsExiting(true);
             uponExit?.();
+            setIsExiting(true);
         };
     }, [upcomingText]);
     return <MotionFlex
@@ -263,10 +270,17 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
         {children}
         <MotionFlex
             bg={"#FDFD1F"}
-            className={"b0 z3 flex-col"}
-            initial={{ y: componentFirstInit ? "100%" : 80 }}
+            className={"z3 rel flex-col-rev"}
+            initial={{ y: (() => {
+                // Widget's dimension transition is distorted when set to a relative height.
+                // Apparently, it's unfixable, partly because
+                // the timing between ImageGallery's first initialization vs. this component's first initialization is different.
+                // So, I've set the height to 101 since it's the maximum height of the text when it's fully expanded.
+                // @min-res: 800x600
+                return /* componentFirstInit ? "100%" : */ 101;
+            })() }}
             animate={{ y: 0 }}
-            exit={{ y: componentFirstInit ? "100%" : 80 }}
+            exit={{ y: /* "100%" */ 101 }}
             transition={{
                 duration: 0.7,
                 ease: SlowDown,
@@ -282,7 +296,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
         >
             <MotionBox
                 p={"10px 20px"}
-                className={"rel"}
+                className={"rel overflow-hidden"}
                 initial={{
                     y: 80
                 }}
@@ -308,7 +322,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                 <AnimatePresence>
                     <MotionBox
                         key={`text-desc-${currentText[0]}-${currentText.length}`}
-                        className={"abs overflow-hidden"}
+                        className={"abs"}
                         as={"p"}
                         color={"#fff"}
                         layout={"position"}
@@ -342,7 +356,7 @@ export const ImageDesc: FC<IImageDescProps> = ({ text: upcomingText, hideText = 
                             }
                         }}
                     >
-                        {/*{currentText}*/}
+                        {currentText}
                     </MotionBox>
                 </AnimatePresence>
                 <MotionBox
